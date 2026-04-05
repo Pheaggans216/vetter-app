@@ -1,0 +1,33 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Associated vetting request"
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Email addresses of participants"
+    },
+    "last_message": {
+      "type": "string",
+      "description": "Preview of the last message"
+    },
+    "last_message_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of last message"
+    },
+    "unread_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "participants"
+  ]
+}

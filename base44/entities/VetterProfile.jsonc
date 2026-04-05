@@ -1,0 +1,79 @@
+{
+  "name": "VetterProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email linked to the user account"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Public display name"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Short bio about the vetter"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "specialties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas of expertise"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "zip_code": {
+      "type": "string"
+    },
+    "service_radius_miles": {
+      "type": "number",
+      "default": 25
+    },
+    "hourly_rate": {
+      "type": "number",
+      "description": "Hourly rate in dollars"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Average rating out of 5"
+    },
+    "total_reviews": {
+      "type": "number",
+      "default": 0
+    },
+    "total_inspections": {
+      "type": "number",
+      "default": 0
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "available": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "pending_review"
+      ],
+      "default": "pending_review"
+    }
+  },
+  "required": [
+    "user_email",
+    "display_name"
+  ]
+}

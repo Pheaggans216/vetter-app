@@ -1,0 +1,75 @@
+{
+  "name": "Report",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "ID of the associated vetting request"
+    },
+    "vetter_email": {
+      "type": "string",
+      "description": "Email of the vetter who wrote the report"
+    },
+    "buyer_email": {
+      "type": "string",
+      "description": "Email of the buyer who receives the report"
+    },
+    "overall_condition": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor",
+        "defective"
+      ],
+      "description": "Overall condition rating"
+    },
+    "matches_listing": {
+      "type": "boolean",
+      "description": "Whether the item matches the listing description"
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "negotiate",
+        "pass"
+      ],
+      "description": "Vetter's recommendation"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief summary of findings"
+    },
+    "detailed_notes": {
+      "type": "string",
+      "description": "Detailed inspection notes"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Photos taken during inspection"
+    },
+    "issues_found": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of issues found"
+    },
+    "estimated_value": {
+      "type": "number",
+      "description": "Vetter's estimated fair market value"
+    }
+  },
+  "required": [
+    "request_id",
+    "vetter_email",
+    "overall_condition",
+    "recommendation",
+    "summary"
+  ]
+}

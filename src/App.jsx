@@ -5,7 +5,18 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+
+import AppLayout from '@/components/layout/AppLayout';
+import Home from '@/pages/Home';
+import Requests from '@/pages/Requests';
+import NewRequest from '@/pages/NewRequest';
+import RequestDetail from '@/pages/RequestDetail';
+import Messages from '@/pages/Messages';
+import Profile from '@/pages/Profile';
+import Onboarding from '@/pages/Onboarding';
+import Jobs from '@/pages/vetter/Jobs';
+import Schedule from '@/pages/vetter/Schedule';
+import Earnings from '@/pages/vetter/Earnings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +44,18 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/onboarding" element={<Onboarding />} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/requests" element={<Requests />} />
+        <Route path="/requests/new" element={<NewRequest />} />
+        <Route path="/requests/:id" element={<RequestDetail />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/schedule" element={<Schedule />} />
+        <Route path="/earnings" element={<Earnings />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

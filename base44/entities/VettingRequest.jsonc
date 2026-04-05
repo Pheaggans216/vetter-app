@@ -1,0 +1,124 @@
+{
+  "name": "VettingRequest",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the item to be vetted"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the item"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "electronics",
+        "vehicles",
+        "furniture",
+        "collectibles",
+        "jewelry",
+        "appliances",
+        "sporting_goods",
+        "tools",
+        "clothing",
+        "other"
+      ],
+      "description": "Item category"
+    },
+    "listing_url": {
+      "type": "string",
+      "description": "URL to the original marketplace listing"
+    },
+    "listing_platform": {
+      "type": "string",
+      "enum": [
+        "facebook_marketplace",
+        "craigslist",
+        "ebay",
+        "offerup",
+        "other"
+      ],
+      "description": "Which marketplace the listing is from"
+    },
+    "listing_price": {
+      "type": "number",
+      "description": "Listed price of the item"
+    },
+    "item_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Photos of the item from the listing"
+    },
+    "location_city": {
+      "type": "string",
+      "description": "City where the item is located"
+    },
+    "location_state": {
+      "type": "string",
+      "description": "State where the item is located"
+    },
+    "location_zip": {
+      "type": "string",
+      "description": "ZIP code where the item is located"
+    },
+    "buyer_email": {
+      "type": "string",
+      "description": "Email of the buyer who created the request"
+    },
+    "seller_email": {
+      "type": "string",
+      "description": "Email of the seller if known"
+    },
+    "vetter_email": {
+      "type": "string",
+      "description": "Email of the assigned vetter"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "matched",
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Current status of the vetting request"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "rush"
+      ],
+      "default": "standard"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date for the inspection"
+    },
+    "scheduled_time": {
+      "type": "string",
+      "description": "Time for the inspection"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Budget for the vetting service"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes from the buyer"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "listing_platform",
+    "buyer_email"
+  ]
+}

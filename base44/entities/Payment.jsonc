@@ -1,0 +1,54 @@
+{
+  "name": "Payment",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Associated vetting request ID"
+    },
+    "payer_email": {
+      "type": "string",
+      "description": "Who is paying"
+    },
+    "payee_email": {
+      "type": "string",
+      "description": "Who is receiving payment"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Payment amount in dollars"
+    },
+    "platform_fee": {
+      "type": "number",
+      "description": "Vetter platform fee"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "held",
+        "released",
+        "refunded",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "card",
+        "paypal",
+        "apple_pay"
+      ],
+      "default": "card"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "payer_email",
+    "amount"
+  ]
+}
