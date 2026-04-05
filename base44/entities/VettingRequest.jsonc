@@ -13,15 +13,14 @@
     "category": {
       "type": "string",
       "enum": [
+        "cars_and_motorcycles",
         "electronics",
-        "vehicles",
-        "furniture",
-        "collectibles",
-        "jewelry",
         "appliances",
-        "sporting_goods",
-        "tools",
-        "clothing",
+        "jewelry_and_watches",
+        "luxury_fashion_and_handbags",
+        "furniture",
+        "tools_and_equipment",
+        "rental_or_property_verification",
         "other"
       ],
       "description": "Item category"
@@ -52,29 +51,36 @@
       },
       "description": "Photos of the item from the listing"
     },
+    "uploaded_screenshots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Buyer-uploaded screenshot URLs"
+    },
     "location_city": {
-      "type": "string",
-      "description": "City where the item is located"
+      "type": "string"
     },
     "location_state": {
-      "type": "string",
-      "description": "State where the item is located"
+      "type": "string"
     },
     "location_zip": {
-      "type": "string",
-      "description": "ZIP code where the item is located"
+      "type": "string"
     },
     "buyer_email": {
-      "type": "string",
-      "description": "Email of the buyer who created the request"
+      "type": "string"
     },
     "seller_email": {
-      "type": "string",
-      "description": "Email of the seller if known"
+      "type": "string"
+    },
+    "seller_name": {
+      "type": "string"
+    },
+    "seller_phone": {
+      "type": "string"
     },
     "vetter_email": {
-      "type": "string",
-      "description": "Email of the assigned vetter"
+      "type": "string"
     },
     "status": {
       "type": "string",
@@ -86,8 +92,16 @@
         "completed",
         "cancelled"
       ],
-      "default": "pending",
-      "description": "Current status of the vetting request"
+      "default": "pending"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": [
+        "standard_verification",
+        "specialist_vetting",
+        "secure_exchange_presence"
+      ],
+      "description": "Type of vetting service requested"
     },
     "urgency": {
       "type": "string",
@@ -97,28 +111,29 @@
       ],
       "default": "standard"
     },
+    "preferred_time_window": {
+      "type": "string",
+      "description": "Preferred date/time range"
+    },
     "scheduled_date": {
       "type": "string",
-      "format": "date",
-      "description": "Date for the inspection"
+      "format": "date"
     },
     "scheduled_time": {
-      "type": "string",
-      "description": "Time for the inspection"
+      "type": "string"
     },
     "budget": {
-      "type": "number",
-      "description": "Budget for the vetting service"
+      "type": "number"
     },
     "notes": {
-      "type": "string",
-      "description": "Additional notes from the buyer"
+      "type": "string"
     }
   },
   "required": [
     "title",
     "category",
     "listing_platform",
-    "buyer_email"
+    "buyer_email",
+    "service_type"
   ]
 }

@@ -13,7 +13,7 @@ const vetterTabs = [
   { label: "Jobs", icon: Briefcase, path: "/jobs" },
   { label: "Schedule", icon: Calendar, path: "/schedule" },
   { label: "Earnings", icon: DollarSign, path: "/earnings" },
-  { label: "Profile", icon: User, path: "/profile" },
+  { label: "Profile", icon: User, path: "/vetter/profile" },
 ];
 
 export default function BottomNav({ userRole }) {
