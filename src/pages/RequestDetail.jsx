@@ -1,11 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2, UserCheck, Calendar, DollarSign } from "lucide-react";
+import {
+  ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
+  UserCheck, Calendar, DollarSign
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import MatchingPanel from "@/components/matching/MatchingPanel";
 
 const statusConfig = {
   pending: { label: "Pending", icon: Clock, className: "bg-muted text-muted-foreground" },
@@ -18,21 +23,26 @@ const statusConfig = {
 
 const platformLabels = {
   facebook_marketplace: "Facebook Marketplace",
-  craigslist: "Craigslist",
-  ebay: "eBay",
-  offerup: "OfferUp",
-  other: "Other",
+  craigslist: "Craigslist", ebay: "eBay", offerup: "OfferUp", other: "Other",
 };
 
 const categoryLabels = {
-  electronics: "Electronics", vehicles: "Vehicles", furniture: "Furniture",
-  collectibles: "Collectibles", jewelry: "Jewelry", appliances: "Appliances",
-  sporting_goods: "Sporting Goods", tools: "Tools", clothing: "Clothing", other: "Other",
+  cars_and_motorcycles: "Cars & Motorcycles", electronics: "Electronics", appliances: "Appliances",
+  jewelry_and_watches: "Jewelry & Watches", luxury_fashion_and_handbags: "Luxury Fashion",
+  furniture: "Furniture", tools_and_equipment: "Tools & Equipment",
+  rental_or_property_verification: "Property Verification", other: "Other",
+};
+
+const serviceLabels = {
+  standard_verification: "Standard Verification",
+  specialist_vetting: "Specialist Vetting",
+  secure_exchange_presence: "Secure Exchange Presence",
 };
 
 export default function RequestDetail() {
-  const urlParams = new URLSearchParams(window.location.search);
   const id = window.location.pathname.split("/").pop();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["vetting-request", id],
@@ -40,6 +50,14 @@ export default function RequestDetail() {
   });
 
   const request = requests[0];
+
+  // Fetch assigned vetter profile if matched
+  const { data: vetterProfiles = [] } = useQuery({
+    queryKey: ["vetter-profile-match", request?.vetter_email],
+    queryFn: () => base44.entities.VetterProfile.filter({ user_email: request.vetter_email }),
+    enabled: !!request?.vetter_email,
+  });
+  const assignedVetter = vetterProfiles[0];
 
   if (isLoading) {
     return (
@@ -67,6 +85,8 @@ export default function RequestDetail() {
 
   const status = statusConfig[request.status] || statusConfig.pending;
   const StatusIcon = status.icon;
+  const isBuyer = user?.email === request.buyer_email;
+  const showMatching = isBuyer && request.status === "pending";
 
   return (
     <div className="px-5 pt-4 pb-8">
@@ -97,18 +117,26 @@ export default function RequestDetail() {
             <div>
               <p className="text-[11px] text-muted-foreground mb-0.5">Platform</p>
               <p className="text-[13px] font-medium text-foreground">
-                {platformLabels[request.listing_platform]}
+                {platformLabels[request.listing_platform] || request.listing_platform}
               </p>
             </div>
             <div>
               <p className="text-[11px] text-muted-foreground mb-0.5">Category</p>
               <p className="text-[13px] font-medium text-foreground">
-                {categoryLabels[request.category]}
+                {categoryLabels[request.category] || request.category}
               </p>
             </div>
+            {request.service_type && (
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-0.5">Service</p>
+                <p className="text-[13px] font-medium text-foreground">
+                  {serviceLabels[request.service_type]}
+                </p>
+              </div>
+            )}
             {request.listing_price && (
               <div>
-                <p className="text-[11px] text-muted-foreground mb-0.5">Price</p>
+                <p className="text-[11px] text-muted-foreground mb-0.5">Item Price</p>
                 <p className="text-[13px] font-semibold text-foreground flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5" />
                   {request.listing_price.toLocaleString()}
@@ -126,6 +154,29 @@ export default function RequestDetail() {
             )}
           </div>
         </div>
+
+        {/* Assigned Vetter */}
+        {assignedVetter && request.status !== "pending" && (
+          <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
+            <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2.5">Your Vetter</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {assignedVetter.avatar_url ? (
+                  <img src={assignedVetter.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-primary font-bold">{assignedVetter.display_name?.[0]}</span>
+                )}
+              </div>
+              <div>
+                <p className="font-semibold text-foreground text-[14px]">{assignedVetter.display_name}</p>
+                <p className="text-muted-foreground text-[12px]">
+                  {[assignedVetter.city, assignedVetter.state].filter(Boolean).join(", ")}
+                  {assignedVetter.rating && ` · ⭐ ${assignedVetter.rating.toFixed(1)}`}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Description */}
         {request.description && (
@@ -150,6 +201,16 @@ export default function RequestDetail() {
           <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
             <p className="text-[13px] font-semibold text-foreground mb-2">Notes</p>
             <p className="text-[13px] text-muted-foreground leading-relaxed">{request.notes}</p>
+          </div>
+        )}
+
+        {/* Matching Panel — shown to buyer when request is still pending */}
+        {showMatching && (
+          <div className="pt-2">
+            <MatchingPanel
+              request={request}
+              onMatched={() => queryClient.invalidateQueries({ queryKey: ["vetting-request", id] })}
+            />
           </div>
         )}
       </div>
