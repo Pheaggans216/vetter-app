@@ -4,7 +4,8 @@ import { useAuth } from "@/lib/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check } from "lucide-react";
+import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
 const SERVICE_LABELS = {
@@ -84,7 +85,16 @@ function JobCard({ job, onAccept, onDecline, actionPending, showActions }) {
         </div>
       )}
 
-      {!showActions && (
+      {!showActions && job.status === "scheduled" && (
+        <Link to={`/jobs/${job.id}/report`}>
+          <Button size="sm" className="w-full rounded-xl h-9 text-[13px] font-semibold">
+            <FileText className="w-3.5 h-3.5 mr-1" />
+            Submit Inspection Report
+          </Button>
+        </Link>
+      )}
+
+      {!showActions && job.status !== "scheduled" && (
         <div className="flex items-center gap-1">
           <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
           <span className="text-[12px] text-accent font-medium capitalize">{job.status.replace("_", " ")}</span>

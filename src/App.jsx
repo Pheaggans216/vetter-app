@@ -19,6 +19,8 @@ import Schedule from '@/pages/vetter/Schedule';
 import Earnings from '@/pages/vetter/Earnings';
 import VetterOnboarding from '@/pages/vetter/VetterOnboarding';
 import VetterProfilePage from '@/pages/vetter/VetterProfile';
+import SubmitReport from '@/pages/vetter/SubmitReport';
+import ReportView from '@/pages/ReportView';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,6 +61,8 @@ const AuthenticatedApp = () => {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/earnings" element={<Earnings />} />
         <Route path="/vetter/profile" element={<VetterProfilePage />} />
+        <Route path="/jobs/:id/report" element={<SubmitReport />} />
+        <Route path="/requests/:id/report" element={<ReportView />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
-  UserCheck, Calendar, DollarSign
+  UserCheck, Calendar, DollarSign, ShieldCheck
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -202,6 +202,22 @@ export default function RequestDetail() {
             <p className="text-[13px] font-semibold text-foreground mb-2">Notes</p>
             <p className="text-[13px] text-muted-foreground leading-relaxed">{request.notes}</p>
           </div>
+        )}
+
+        {/* View Report — shown when completed */}
+        {request.status === "completed" && (
+          <Link to={`/requests/${request.id}/report`}>
+            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-center justify-between hover:bg-primary/10 transition-colors">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-[14px] font-heading font-bold text-foreground">Inspection Report Ready</p>
+                  <p className="text-[12px] text-muted-foreground">Tap to view the full report</p>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-primary" />
+            </div>
+          </Link>
         )}
 
         {/* Matching Panel — shown to buyer when request is still pending */}
