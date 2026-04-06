@@ -102,9 +102,9 @@ export default function MatchingPanel({ request, onMatched }) {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[14px] font-heading font-bold text-foreground mb-0.5">Find your Vetter</p>
+        <p className="text-[14px] font-heading font-bold text-foreground mb-0.5">Trusted local professionals</p>
         <p className="text-[12px] text-muted-foreground">
-          Real people. Real proof. Select a verified local expert to inspect this item.
+          Every Vetter is ID-verified and reviewed. Select the right expert for this item.
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export default function MatchingPanel({ request, onMatched }) {
       </Tabs>
 
       {selectedVetter && (
-        <div className="sticky bottom-20 left-0 right-0">
+        <div className="sticky bottom-20 left-0 right-0 space-y-2">
           <Button
             onClick={() => assignMutation.mutate()}
             disabled={assignMutation.isPending}
@@ -177,6 +177,10 @@ export default function MatchingPanel({ request, onMatched }) {
               <>Confirm — {selectedVetter.display_name}</>
             )}
           </Button>
+          <p className="text-[11px] text-muted-foreground text-center px-2">
+            Vetter verifies items professionally but does not guarantee transaction outcomes.{" "}
+            <a href="/faq" className="underline underline-offset-2 hover:text-primary">Learn more</a>
+          </p>
         </div>
       )}
     </div>

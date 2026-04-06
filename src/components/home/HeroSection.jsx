@@ -20,17 +20,24 @@ export default function HeroSection() {
           </h1>
         </div>
         <h2 className="text-[28px] leading-tight font-heading font-bold text-foreground mb-3">
-          Verify before<br />you buy.
+          Buy with confidence.<br />Verified in the real world.
         </h2>
         <p className="text-muted-foreground font-body text-[15px] leading-relaxed mb-6 max-w-[300px]">
-          Hire a trusted local pro to inspect items from Facebook Marketplace, Craigslist, eBay & more — before money changes hands.
+          A trusted local professional inspects the item in person — so you know exactly what you're getting before money changes hands.
         </p>
-        <Link to="/requests/new">
-          <Button size="lg" className="rounded-xl h-12 px-6 text-[15px] font-semibold shadow-sm">
-            Get an item vetted
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
+        <div className="flex flex-col gap-3">
+          <Link to="/requests/new">
+            <Button size="lg" className="rounded-xl h-12 px-6 text-[15px] font-semibold shadow-sm w-full">
+              Get an item inspected
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+          <Link to="/faq">
+            <p className="text-[12px] text-muted-foreground text-center hover:text-primary transition-colors">
+              How does it work? What does a Vetter do? →
+            </p>
+          </Link>
+        </div>
       </motion.div>
     </section>
   );

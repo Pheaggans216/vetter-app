@@ -38,9 +38,9 @@ export default function VetterMatchCard({ vetter, serviceType, onSelect, selecte
       )}
     >
       {isTop && (
-        <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-center gap-1.5 mb-2">
           <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-          <span className="text-[11px] font-semibold text-amber-600">Top Match</span>
+          <span className="text-[11px] font-semibold text-amber-600">Best match for this item</span>
         </div>
       )}
 
@@ -98,7 +98,17 @@ export default function VetterMatchCard({ vetter, serviceType, onSelect, selecte
         </div>
       </div>
 
-      {/* Badges */}
+      {/* Completed jobs */}
+      {vetter.total_inspections > 0 && (
+        <div className="flex items-center gap-1 mb-2">
+          <ShieldCheck className="w-3 h-3 text-accent" />
+          <span className="text-[11px] text-muted-foreground">
+            {vetter.total_inspections} inspection{vetter.total_inspections !== 1 ? "s" : ""} completed
+          </span>
+        </div>
+      )}
+
+      {/* Verification badges */}
       {activeBadges.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {activeBadges.map((b) => (
@@ -107,6 +117,15 @@ export default function VetterMatchCard({ vetter, serviceType, onSelect, selecte
               {b.label}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Why suggested */}
+      {isTop && (
+        <div className="mb-3 px-3 py-2 bg-primary/5 rounded-xl border border-primary/10">
+          <p className="text-[11px] text-primary leading-snug">
+            Suggested based on specialty match, rating, and proximity to the item's location.
+          </p>
         </div>
       )}
 

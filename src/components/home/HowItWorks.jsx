@@ -4,20 +4,20 @@ import { motion } from "framer-motion";
 const steps = [
   {
     icon: Search,
-    title: "Submit a request",
-    description: "Share the listing you found and tell us what you need inspected.",
+    title: "Share the listing",
+    description: "Paste the URL of any secondhand listing. Tell us what to look for and where the item is located.",
     color: "bg-primary/10 text-primary",
   },
   {
     icon: UserCheck,
-    title: "Get matched",
-    description: "We connect you with a verified local professional near the item.",
+    title: "We match you with a local pro",
+    description: "A verified, background-checked professional in your area is assigned to the job.",
     color: "bg-accent/15 text-accent",
   },
   {
     icon: ClipboardCheck,
-    title: "Get your report",
-    description: "Receive a detailed inspection report with photos and a recommendation.",
+    title: "Receive a clear report",
+    description: "You get a photo-documented inspection report with a straightforward recommendation: buy, negotiate, or pass.",
     color: "bg-chart-3/15 text-chart-3",
   },
 ];
@@ -25,9 +25,10 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section className="px-5 py-6">
-      <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+      <h3 className="text-lg font-heading font-semibold text-foreground mb-1">
         How it works
       </h3>
+      <p className="text-[13px] text-muted-foreground mb-4">Reduce risk before you commit. It's that simple.</p>
       <div className="space-y-3">
         {steps.map((step, i) => (
           <motion.div
