@@ -24,10 +24,11 @@ const SERVICES = [
     value: "secure_exchange_presence",
     label: "Secure Exchange Presence",
     price: "Starts at $149",
-    description: "Physical presence during the transaction to ensure a safe, verified handoff.",
+    description: "Physical presence during the exchange to ensure a safe, verified handoff for both parties. Requires background screening and approval.",
     icon: ShieldCheck,
     color: "text-chart-3",
     bg: "bg-chart-3/15",
+    requiresApproval: true,
   },
 ];
 
@@ -69,6 +70,12 @@ export default function StepServices({ profile, update }) {
                     <span className={cn("text-[12px] font-semibold", s.color)}>{s.price}</span>
                   </div>
                   <p className="text-muted-foreground text-[12px] leading-relaxed">{s.description}</p>
+                  {s.requiresApproval && selected && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <ShieldCheck className="w-3 h-3 text-chart-3" />
+                      <span className="text-[11px] text-chart-3 font-medium">Subject to additional approval during review</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
