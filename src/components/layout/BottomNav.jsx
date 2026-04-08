@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign } from "lucide-react";
+import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buyerTabs = [
   { label: "Home", icon: Home, path: "/home" },
   { label: "Requests", icon: FileText, path: "/requests" },
+  { label: "Find Vetters", icon: MapPin, path: "/map" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/profile" },
 ];

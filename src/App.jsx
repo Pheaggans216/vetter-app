@@ -23,6 +23,7 @@ import VetterProfilePage from '@/pages/vetter/VetterProfile';
 import SubmitReport from '@/pages/vetter/SubmitReport';
 import ReportView from '@/pages/ReportView';
 import FAQ from '@/pages/FAQ';
+import VetterMap from '@/pages/VetterMap';
 import AdminLayout from '@/pages/admin/AdminLayout';
 import AdminOverview from '@/pages/admin/AdminOverview';
 import AdminVetters from '@/pages/admin/AdminVetters';
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
         <Route path="/jobs/:id/report" element={<SubmitReport />} />
         <Route path="/requests/:id/report" element={<ReportView />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/map" element={<VetterMap />} />
       </Route>
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<AdminOverview />} />
