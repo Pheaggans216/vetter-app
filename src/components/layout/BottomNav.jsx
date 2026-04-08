@@ -3,7 +3,7 @@ import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign } 
 import { cn } from "@/lib/utils";
 
 const buyerTabs = [
-  { label: "Home", icon: Home, path: "/" },
+  { label: "Home", icon: Home, path: "/home" },
   { label: "Requests", icon: FileText, path: "/requests" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/profile" },
@@ -25,7 +25,7 @@ export default function BottomNav({ userRole }) {
       <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-1">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path || 
-            (tab.path !== "/" && location.pathname.startsWith(tab.path));
+            (tab.path !== "/home" && location.pathname.startsWith(tab.path));
           const Icon = tab.icon;
           
           return (

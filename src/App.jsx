@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
+import Landing from '@/pages/Landing';
 import AppLayout from '@/components/layout/AppLayout';
 import Home from '@/pages/Home';
 import Requests from '@/pages/Requests';
@@ -49,10 +50,11 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/requests" element={<Requests />} />
         <Route path="/requests/new" element={<NewRequest />} />
         <Route path="/requests/:id" element={<RequestDetail />} />
