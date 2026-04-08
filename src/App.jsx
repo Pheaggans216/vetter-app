@@ -23,6 +23,14 @@ import VetterProfilePage from '@/pages/vetter/VetterProfile';
 import SubmitReport from '@/pages/vetter/SubmitReport';
 import ReportView from '@/pages/ReportView';
 import FAQ from '@/pages/FAQ';
+import AdminLayout from '@/pages/admin/AdminLayout';
+import AdminOverview from '@/pages/admin/AdminOverview';
+import AdminVetters from '@/pages/admin/AdminVetters';
+import AdminRequests from '@/pages/admin/AdminRequests';
+import AdminDisputes from '@/pages/admin/AdminDisputes';
+import AdminPayments from '@/pages/admin/AdminPayments';
+import AdminFlagged from '@/pages/admin/AdminFlagged';
+import AdminMetrics from '@/pages/admin/AdminMetrics';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -67,6 +75,15 @@ const AuthenticatedApp = () => {
         <Route path="/jobs/:id/report" element={<SubmitReport />} />
         <Route path="/requests/:id/report" element={<ReportView />} />
         <Route path="/faq" element={<FAQ />} />
+      </Route>
+      <Route element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminOverview />} />
+        <Route path="/admin/vetters" element={<AdminVetters />} />
+        <Route path="/admin/requests" element={<AdminRequests />} />
+        <Route path="/admin/disputes" element={<AdminDisputes />} />
+        <Route path="/admin/payments" element={<AdminPayments />} />
+        <Route path="/admin/flagged" element={<AdminFlagged />} />
+        <Route path="/admin/metrics" element={<AdminMetrics />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
