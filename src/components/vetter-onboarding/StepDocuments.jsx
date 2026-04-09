@@ -39,6 +39,8 @@ export default function StepDocuments({ profile, update }) {
     update({ certification_urls: [...(profile.certification_urls || []), url] });
   };
 
+  const isSpecialist = profile.service_types?.includes("specialist_vetting");
+
   return (
     <div>
       <h2 className="text-[22px] font-heading font-bold text-foreground mb-1">Verify your identity</h2>
@@ -54,8 +56,8 @@ export default function StepDocuments({ profile, update }) {
           onUpload={(url) => update({ id_document_url: url })}
         />
         <UploadBox
-          label="Certification or License"
-          description="Professional cert, trade license, or diploma"
+          label={isSpecialist ? "Professional Certification or License" : "Certification or License (optional)"}
+          description={isSpecialist ? "Required for Specialist role — trade license, diploma, or cert" : "Any professional cert or trade license"}
           icon={FileText}
           value={profile.certification_urls?.[0]}
           onUpload={handleCertUpload}
@@ -68,6 +70,11 @@ export default function StepDocuments({ profile, update }) {
           onUpload={(url) => update({ avatar_url: url })}
         />
       </div>
+      {isSpecialist && !profile.certification_urls?.length && (
+        <div className="mt-4 px-4 py-3 bg-accent/10 rounded-xl border border-accent/20">
+          <p className="text-[12px] text-accent font-medium">📋 Specialist Vetters must upload at least one certification or license to be approved.</p>
+        </div>
+      )}
       <p className="text-[11px] text-muted-foreground mt-4 text-center">
         🔒 Documents are encrypted and never shared publicly.
       </p>

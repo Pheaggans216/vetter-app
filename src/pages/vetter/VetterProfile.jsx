@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, Star, MapPin, Clock, Briefcase, Award,
-  CheckCircle2, Edit, User, Zap
+  CheckCircle2, Edit, User, Zap, Wrench, ClipboardCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -22,6 +22,13 @@ const SERVICE_LABELS = {
   specialist_vetting: "Specialist Vetting",
   secure_exchange_presence: "Secure Exchange Presence",
 };
+
+// Role-based profile badges (shown when role is active)
+const ROLE_BADGES = [
+  { key: "standard", serviceKey: "standard_verification", label: "Verified Vetter", icon: ClipboardCheck, color: "bg-primary/10 text-primary border-primary/20" },
+  { key: "specialist", serviceKey: "specialist_vetting", label: "Certified Specialist", icon: Wrench, color: "bg-accent/15 text-accent border-accent/20" },
+  { key: "secure", serviceKey: "secure_exchange_presence", label: "Secure Exchange Provider", icon: ShieldCheck, color: "bg-chart-3/15 text-chart-3 border-chart-3/20" },
+];
 
 const STATUS_BADGES = [
   { key: "identity_verified", label: "Identity Verified", icon: User, color: "bg-primary/10 text-primary border-primary/20" },
@@ -102,6 +109,18 @@ export default function VetterProfile() {
           </div>
         </div>
 
+        {/* Role badges */}
+        {profile.service_types?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {ROLE_BADGES.filter(b => profile.service_types?.includes(b.serviceKey)).map(b => (
+              <div key={b.key} className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold", b.color)}>
+                <b.icon className="w-3 h-3" />
+                {b.label}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <StatBox value={profile.rating?.toFixed(1) || "—"} label="Rating" icon={Star} />
@@ -109,14 +128,11 @@ export default function VetterProfile() {
           <StatBox value={profile.avg_response_time || "< 2h"} label="Response" icon={Clock} />
         </div>
 
-        {/* Status badges */}
+        {/* Verification badges */}
         {activeBadges.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {activeBadges.map((b) => (
-              <div
-                key={b.key}
-                className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold", b.color)}
-              >
+              <div key={b.key} className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold", b.color)}>
                 <b.icon className="w-3 h-3" />
                 {b.label}
               </div>

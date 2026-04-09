@@ -1,4 +1,4 @@
-import { ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Clock, CheckCircle2, ClipboardCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const SPECIALTY_LABELS = {
@@ -14,13 +14,36 @@ const SERVICE_LABELS = {
   secure_exchange_presence: "Secure Exchange Presence",
 };
 
+const ROLE_BADGES = [
+  { value: "standard_verification", label: "Verified Vetter", icon: ClipboardCheck, color: "bg-primary/10 text-primary border-primary/20" },
+  { value: "specialist_vetting", label: "Certified Specialist", icon: Wrench, color: "bg-accent/15 text-accent border-accent/20" },
+  { value: "secure_exchange_presence", label: "Secure Exchange Provider", icon: ShieldCheck, color: "bg-chart-3/15 text-chart-3 border-chart-3/20" },
+];
+
 export default function StepReview({ profile, onSubmit, submitting }) {
+  const earnedBadges = ROLE_BADGES.filter(b => profile.service_types?.includes(b.value));
+
   return (
     <div>
       <h2 className="text-[22px] font-heading font-bold text-foreground mb-1">Ready to submit</h2>
       <p className="text-muted-foreground text-[14px] mb-6">
         Review your application. Our team will verify your documents and approve your profile within 24–48 hours.
       </p>
+
+      {/* Role badges preview */}
+      {earnedBadges.length > 0 && (
+        <div className="mb-5 p-4 bg-card rounded-2xl border border-border/60">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">Your profile badges</p>
+          <div className="flex flex-wrap gap-2">
+            {earnedBadges.map(b => (
+              <div key={b.value} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-semibold ${b.color}`}>
+                <b.icon className="w-3.5 h-3.5" />
+                {b.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3 mb-8">
         <Row label="Name" value={profile.display_name} />

@@ -8,17 +8,18 @@ import StepDocuments from "@/components/vetter-onboarding/StepDocuments";
 import StepExperience from "@/components/vetter-onboarding/StepExperience";
 import StepLocation from "@/components/vetter-onboarding/StepLocation";
 import StepAvailability from "@/components/vetter-onboarding/StepAvailability";
-import StepServices from "@/components/vetter-onboarding/StepServices";
+import StepRoles from "@/components/vetter-onboarding/StepRoles";
+import StepSecureExchange from "@/components/vetter-onboarding/StepSecureExchange";
 import StepReview from "@/components/vetter-onboarding/StepReview";
 import { Shield } from "lucide-react";
 
-const STEPS = [
+const BASE_STEPS = [
+  "Roles",
   "Specialties",
   "Documents",
   "Experience",
   "Location",
   "Availability",
-  "Services",
   "Review",
 ];
 
@@ -41,6 +42,9 @@ export default function VetterOnboarding() {
     state: "",
     zip_code: "",
     service_radius_miles: 25,
+    secure_exchange_credential_url: "",
+    secure_exchange_license_url: "",
+    secure_exchange_confirmations: {},
     availability: {
       monday: true, tuesday: true, wednesday: true,
       thursday: true, friday: true, saturday: false, sunday: false,
@@ -48,6 +52,12 @@ export default function VetterOnboarding() {
   });
 
   const update = (fields) => setProfile((prev) => ({ ...prev, ...fields }));
+
+  // Dynamically compute steps based on selected roles
+  const hasSecureExchange = profile.service_types?.includes("secure_exchange_presence");
+  const STEPS = hasSecureExchange
+    ? ["Roles", "Specialties", "Secure Exchange", "Documents", "Experience", "Location", "Availability", "Review"]
+    : BASE_STEPS;
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -57,6 +67,8 @@ export default function VetterOnboarding() {
       years_of_experience: Number(profile.years_of_experience) || 0,
       service_radius_miles: Number(profile.service_radius_miles) || 25,
       status: "pending_review",
+      secure_exchange_approved: false,
+      certified_specialist: profile.service_types?.includes("specialist_vetting") ? true : undefined,
     });
     await base44.auth.updateMe({ role: "vetter", onboarded: true });
     await refreshUser();
@@ -65,13 +77,24 @@ export default function VetterOnboarding() {
 
   const stepProps = { profile, update };
 
-  const steps = [
+  const steps = hasSecureExchange
+    ? [
+        <StepRoles {...stepProps} />,
+        <StepSpecialties {...stepProps} />,
+        <StepSecureExchange {...stepProps} />,
+        <StepDocuments {...stepProps} />,
+        <StepExperience {...stepProps} />,
+        <StepLocation {...stepProps} />,
+        <StepAvailability {...stepProps} />,
+        <StepReview {...stepProps} onSubmit={handleSubmit} submitting={submitting} />,
+      ]
+    : [
+    <StepRoles {...stepProps} />,
     <StepSpecialties {...stepProps} />,
     <StepDocuments {...stepProps} />,
     <StepExperience {...stepProps} />,
     <StepLocation {...stepProps} />,
     <StepAvailability {...stepProps} />,
-    <StepServices {...stepProps} />,
     <StepReview {...stepProps} onSubmit={handleSubmit} submitting={submitting} />,
   ];
 
