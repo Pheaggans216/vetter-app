@@ -138,7 +138,7 @@ export default function VetterDetailPanel({ vetter, distanceMi, serviceType, onS
             className="w-full rounded-xl h-12 text-[15px] font-semibold shadow-sm"
             variant={selected ? "secondary" : "default"}
           >
-            {selected ? <><CheckCircle2 className="w-4 h-4 mr-2" />Selected</> : "Select This Vetter"}
+            {selected ? <><CheckCircle2 className="w-4 h-4 mr-2" />Selected</> : "Request This Vetter"}
           </Button>
         </div>
       </motion.div>

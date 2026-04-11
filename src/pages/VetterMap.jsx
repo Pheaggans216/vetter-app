@@ -14,47 +14,29 @@ import "leaflet/dist/leaflet.css";
 import VetterDetailPanel from "@/components/map/VetterDetailPanel";
 import VetterListCard from "@/components/map/VetterListCard";
 import MapFilters from "@/components/map/MapFilters";
+import { getAvailableIconSvg, getBusyIconSvg, getTopRatedIconSvg } from "@/components/map/VetterMapIcons";
 import { geocodeLocation, cityFallback, distanceMiles, stableJitter } from "@/lib/geocode";
 
 // ── Leaflet icon fix (no default icon 404) ──────────────────────────────────
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl: "", shadowUrl: "" });
 
-// Build a Leaflet DivIcon from a vetter
+// Build a Leaflet DivIcon using custom SVG ram icons
 function makePinIcon(vetter, selected) {
-  const tier = vetter.secure_exchange_approved
-    ? { ring: "#D97706", bg: "#FEF3C7" }
-    : vetter.certified_specialist
-    ? { ring: "#16A34A", bg: "#DCFCE7" }
-    : { ring: "#3B82F6", bg: "#EFF6FF" };
-  const avail = vetter.available !== false ? "#22C55E" : "#9CA3AF";
-  const initial = vetter.display_name?.[0]?.toUpperCase() || "V";
-  const scale = selected ? 1.2 : 1;
-  const size = Math.round(40 * scale);
-  const html = `
-    <div style="
-      width:${size}px;height:${size}px;border-radius:50%;
-      background:${tier.bg};border:2.5px solid ${tier.ring};
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:${selected ? `0 0 0 4px ${tier.ring}44,0 4px 12px rgba(0,0,0,.18)` : "0 2px 8px rgba(0,0,0,.14)"};
-      overflow:hidden;position:relative;font-family:inherit;
-    ">
-      ${vetter.avatar_url
-        ? `<img src="${vetter.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`
-        : `<span style="font-weight:700;font-size:${Math.round(15*scale)}px;color:${tier.ring}">${initial}</span>`
-      }
-      <div style="position:absolute;bottom:1px;right:1px;width:${Math.round(10*scale)}px;height:${Math.round(10*scale)}px;
-        border-radius:50%;background:${avail};border:1.5px solid white;"></div>
-    </div>
-    <div style="width:0;height:0;border-left:${Math.round(5*scale)}px solid transparent;
-      border-right:${Math.round(5*scale)}px solid transparent;
-      border-top:${Math.round(7*scale)}px solid ${tier.ring};
-      margin:0 auto;margin-top:-1px;"></div>
-  `;
-  const anchor = Math.round((size) / 2);
+  const isTopRated = vetter.rating >= 4.8 || vetter.secure_exchange_approved;
+  const isBusy = vetter.available === false;
+  const svgHtml = isTopRated
+    ? getTopRatedIconSvg(selected ? 52 : 44)
+    : isBusy
+    ? getBusyIconSvg(selected ? 52 : 44)
+    : getAvailableIconSvg(selected ? 52 : 44);
+  const size = selected ? 52 : 44;
+  const height = Math.round(size * 1.2);
   return L.divIcon({
-    html, className: "", iconSize: [size, size + Math.round(7 * scale)],
-    iconAnchor: [anchor, size + Math.round(7 * scale)],
+    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.6))' : 'none'}">${svgHtml}</div>`,
+    className: "",
+    iconSize: [size, height],
+    iconAnchor: [size / 2, height],
   });
 }
 
@@ -68,8 +50,17 @@ function FlyTo({ center, zoom = 12 }) {
 }
 
 const MILES_TO_KM = 1.60934;
-const DEFAULT_CENTER = [39.5, -98.35]; // US center
+const DEFAULT_CENTER = [39.5, -98.35];
 const DEFAULT_ZOOM = 4;
+
+// Demo vetters shown when no real data exists yet
+const DEMO_VETTERS = [
+  { id: "d1", display_name: "Marcus T.", available: true, rating: 4.9, total_inspections: 87, total_reviews: 72, avg_response_time: "< 1 hr", specialties: ["mechanic"], service_types: ["standard_verification","specialist_vetting"], secure_exchange_approved: true, certified_specialist: true, city: "Los Angeles", state: "CA", _demo: true },
+  { id: "d2", display_name: "Sarah K.", available: true, rating: 4.7, total_inspections: 52, total_reviews: 44, avg_response_time: "< 2 hrs", specialties: ["electronics_technician"], service_types: ["standard_verification"], certified_specialist: false, city: "Austin", state: "TX", _demo: true },
+  { id: "d3", display_name: "James R.", available: false, rating: 4.5, total_inspections: 31, total_reviews: 28, avg_response_time: "< 3 hrs", specialties: ["jeweler"], service_types: ["specialist_vetting"], certified_specialist: true, city: "New York", state: "NY", _demo: true },
+  { id: "d4", display_name: "Priya M.", available: true, rating: 4.8, total_inspections: 64, total_reviews: 59, avg_response_time: "< 1 hr", specialties: ["luxury_authenticator"], service_types: ["standard_verification","secure_exchange_presence"], secure_exchange_approved: true, city: "Chicago", state: "IL", _demo: true },
+  { id: "d5", display_name: "Derek W.", available: true, rating: 4.3, total_inspections: 19, total_reviews: 15, avg_response_time: "Same day", specialties: ["appliance_expert"], service_types: ["standard_verification"], city: "Phoenix", state: "AZ", _demo: true },
+];
 
 export default function VetterMap() {
   const [view, setView] = useState("map"); // "map" | "list"
@@ -85,18 +76,41 @@ export default function VetterMap() {
   const [serviceFilter, setServiceFilter] = useState("any");
   const [vetterCoords, setVetterCoords] = useState({});
   const [hasSearched, setHasSearched] = useState(false);
+  const [quickFilter, setQuickFilter] = useState("all"); // all | available | top_rated
+  const [userLocation, setUserLocation] = useState(null);
   const searchRef = useRef();
 
-  const { data: allVetters = [], isLoading } = useQuery({
+  const handleLocateMe = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const coord = [pos.coords.latitude, pos.coords.longitude];
+      setUserLocation(coord);
+      setMapCenter(coord);
+      setMapZoom(12);
+      setHasSearched(true);
+    });
+  }, []);
+
+  const { data: rawVetters = [], isLoading } = useQuery({
     queryKey: ["map-vetters"],
     queryFn: () => base44.entities.VetterProfile.filter({ status: "active" }),
   });
+
+  const allVetters = rawVetters.length > 0 ? rawVetters : DEMO_VETTERS;
 
   // Geocode vetters (city/state) once loaded — cache per vetter id
   useEffect(() => {
     if (!allVetters.length) return;
     allVetters.forEach(async (v) => {
       if (vetterCoords[v.id]) return;
+      if (v._demo) {
+        const coord = cityFallback(v.city);
+        if (coord) {
+          const jittered = stableJitter(coord.lat, coord.lng, v.id);
+          setVetterCoords(prev => ({ ...prev, [v.id]: jittered }));
+        }
+        return;
+      }
       let coord = cityFallback(v.city);
       if (!coord && (v.city || v.state || v.zip_code)) {
         coord = await geocodeLocation(v.city, v.state, v.zip_code);
@@ -137,6 +151,8 @@ export default function VetterMap() {
       if (hasSearched && v._dist != null && v._dist > radius) return false;
       if (minRating !== "any" && v.rating < parseFloat(minRating)) return false;
       if (serviceFilter !== "any" && !v.service_types?.includes(serviceFilter)) return false;
+      if (quickFilter === "available" && v.available === false) return false;
+      if (quickFilter === "top_rated" && !(v.rating >= 4.8 || v.secure_exchange_approved)) return false;
       return true;
     })
     .sort((a, b) => {
@@ -171,9 +187,13 @@ export default function VetterMap() {
       {/* ── Top bar ── */}
       <div className="shrink-0 px-4 pt-5 pb-3 bg-background border-b border-border/40 space-y-3 z-20">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Shield className="w-4 h-4 text-primary" />
-          </div>
+          <button
+            onClick={handleLocateMe}
+            className="w-10 h-10 rounded-xl bg-card border border-border/60 flex items-center justify-center shrink-0 hover:bg-muted transition-colors"
+            title="Use my location"
+          >
+            <Locate className="w-4 h-4 text-primary" />
+          </button>
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -198,6 +218,23 @@ export default function VetterMap() {
           >
             {geocoding ? "…" : "Go"}
           </Button>
+        </div>
+
+        {/* Quick filter pills */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+          {[{ key: "all", label: "Show All" }, { key: "available", label: "Available Only" }, { key: "top_rated", label: "Top-Rated" }].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setQuickFilter(f.key)}
+              className={cn("px-3 py-1.5 rounded-full text-[12px] font-semibold shrink-0 border transition-all",
+                quickFilter === f.key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card border-border/60 text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
 
         {/* View toggle + filter strip */}
@@ -276,6 +313,15 @@ export default function VetterMap() {
                       pathOptions={{ color: "#3B82F6", fillColor: "#3B82F6", fillOpacity: 0.04, weight: 1.5, dashArray: "6 4" }}
                     />
                   )}
+
+                  {/* User location marker */}
+                  {userLocation && (() => {
+                    const userIcon = L.divIcon({
+                      html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:3px solid white;box-shadow:0 0 0 3px rgba(59,130,246,0.3)"></div>`,
+                      className: "", iconSize: [16, 16], iconAnchor: [8, 8],
+                    });
+                    return <Marker position={userLocation} icon={userIcon} />;
+                  })()}
 
                   {/* Vetter pins */}
                   {filteredVetters.map(v => {
@@ -389,17 +435,12 @@ export default function VetterMap() {
       {/* ── Legend strip (map only) ── */}
       {view === "map" && (
         <div className="shrink-0 px-4 py-2 bg-background/95 border-t border-border/40 flex items-center gap-4 overflow-x-auto scrollbar-none z-10">
-          <LegendItem color="#3B82F6" label="Standard" />
-          <LegendItem color="#16A34A" label="Certified" />
-          <LegendItem color="#D97706" label="Premium" />
-          <div className="flex items-center gap-1.5 ml-auto shrink-0">
-            <div className="w-2.5 h-2.5 rounded-full bg-chart-3 border border-white" />
-            <span className="text-[11px] text-muted-foreground">Available</span>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <div className="w-2.5 h-2.5 rounded-full bg-gray-400 border border-white" />
-            <span className="text-[11px] text-muted-foreground">Offline</span>
-          </div>
+          <LegendItem color="#22c55e" label="Available" />
+          <LegendItem color="#f97316" label="Busy" />
+          <LegendItem color="#3b82f6" label="Top-Rated" />
+          {rawVetters.length === 0 && (
+            <span className="text-[10px] text-muted-foreground ml-auto shrink-0 italic">Demo data</span>
+          )}
         </div>
       )}
     </div>
