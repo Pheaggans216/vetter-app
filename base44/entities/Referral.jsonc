@@ -1,0 +1,47 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "referrer_email": {
+      "type": "string",
+      "description": "Email of the user who shared the referral link"
+    },
+    "referred_email": {
+      "type": "string",
+      "description": "Email of the new user who signed up"
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "Unique code tied to the referrer"
+    },
+    "referred_role": {
+      "type": "string",
+      "enum": [
+        "buyer",
+        "vetter"
+      ],
+      "description": "Role of the new user"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "rewarded"
+      ],
+      "default": "pending",
+      "description": "pending = signed up, completed = first job done, rewarded = credit issued"
+    },
+    "reward_amount": {
+      "type": "number",
+      "description": "Reward amount in dollars"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "referrer_email",
+    "referral_code"
+  ]
+}

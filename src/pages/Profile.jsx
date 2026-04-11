@@ -1,8 +1,9 @@
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell } from "lucide-react";
+import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const roleLabels = {
@@ -15,6 +16,7 @@ const roleLabels = {
 const menuItems = [
   { icon: User, label: "Edit Profile", href: "#" },
   { icon: Bell, label: "Notifications", href: "#" },
+  { icon: Gift, label: "Invite & Earn", href: "/referrals" },
   { icon: Settings, label: "Settings", href: "#" },
   { icon: FileText, label: "Terms of Service", href: "#" },
   { icon: HelpCircle, label: "Help & Support", href: "#" },
@@ -60,17 +62,32 @@ export default function Profile() {
       {/* Menu Items */}
       <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden mb-5">
         {menuItems.map((item, i) => (
-          <button
-            key={item.label}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-left",
-              i !== menuItems.length - 1 && "border-b border-border/40"
-            )}
-          >
-            <item.icon className="w-5 h-5 text-muted-foreground" />
-            <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
+          item.href && item.href !== "#" ? (
+            <Link
+              key={item.label}
+              to={item.href}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors",
+                i !== menuItems.length - 1 && "border-b border-border/40"
+              )}
+            >
+              <item.icon className="w-5 h-5 text-muted-foreground" />
+              <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </Link>
+          ) : (
+            <button
+              key={item.label}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-left",
+                i !== menuItems.length - 1 && "border-b border-border/40"
+              )}
+            >
+              <item.icon className="w-5 h-5 text-muted-foreground" />
+              <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )
         ))}
       </div>
 

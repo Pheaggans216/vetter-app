@@ -32,6 +32,7 @@ import AdminDisputes from '@/pages/admin/AdminDisputes';
 import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminFlagged from '@/pages/admin/AdminFlagged';
 import AdminMetrics from '@/pages/admin/AdminMetrics';
+import Referrals from '@/pages/Referrals';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -76,6 +77,7 @@ const AuthenticatedApp = () => {
         <Route path="/jobs/:id/report" element={<SubmitReport />} />
         <Route path="/requests/:id/report" element={<ReportView />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/referrals" element={<Referrals />} />
         <Route path="/map" element={<VetterMap />} />
       </Route>
       <Route element={<AdminLayout />}>
