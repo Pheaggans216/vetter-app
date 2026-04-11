@@ -1,65 +1,62 @@
-import { ShieldCheck, FileText, MapPin, Clock, Star, Lock } from "lucide-react";
-import { motion } from "framer-motion";
+import { Ban, BadgeCheck, Users, Heart } from "lucide-react";
 
-const reasons = [
+const benefits = [
   {
-    icon: ShieldCheck,
-    title: "Verified in the real world",
-    description: "Every Vetter is identity-verified and reviewed by our team before they take a single job.",
+    icon: Ban,
+    title: "Avoid scams and fraud",
+    desc: "Stop sending money to strangers for items that don't exist or aren't as described.",
+    color: "bg-destructive/10 text-destructive",
   },
   {
-    icon: FileText,
-    title: "Documented, honest reports",
-    description: "Photo evidence, condition grading, and a clear buy / negotiate / pass recommendation — no fluff.",
+    icon: BadgeCheck,
+    title: "Verify before you pay",
+    desc: "A certified local expert physically inspects high-value items on your behalf.",
+    color: "bg-primary/10 text-primary",
   },
   {
-    icon: MapPin,
-    title: "Local professionals, not call centers",
-    description: "Vetters are real people in your city with relevant expertise for the item you're buying.",
+    icon: Users,
+    title: "Real people. Real verification.",
+    desc: "Our Vetters are background-checked, identity-verified professionals in your area.",
+    color: "bg-accent/15 text-accent",
   },
   {
-    icon: Clock,
-    title: "Fast turnaround",
-    description: "Most inspections are scheduled and completed within 24–48 hours of your request.",
-  },
-  {
-    icon: Star,
-    title: "Rated after every job",
-    description: "Buyers rate every Vetter. Poor performers don't stay on the platform.",
-  },
-  {
-    icon: Lock,
-    title: "Independent, unbiased assessment",
-    description: "Vetters have no stake in whether you buy. Their only job is an honest evaluation.",
+    icon: Heart,
+    title: "Peace of mind, guaranteed",
+    desc: "Buy with total confidence knowing an expert has your back every step of the way.",
+    color: "bg-chart-3/15 text-chart-3",
   },
 ];
 
 export default function LandingWhyVetter() {
   return (
-    <section className="max-w-5xl mx-auto px-5 py-20">
-      <div className="text-center mb-12">
-        <h2 className="text-[30px] font-heading font-bold text-foreground mb-3">Why Vetter?</h2>
-        <p className="text-muted-foreground text-[15px] max-w-[400px] mx-auto">
-          Secondhand platforms are full of great deals — and real risk. Vetter closes that gap.
-        </p>
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {reasons.map((r, i) => (
-          <motion.div
-            key={r.title}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.35, delay: i * 0.07 }}
-            className="p-5 rounded-2xl bg-card border border-border/60 shadow-sm"
-          >
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-              <r.icon className="w-4.5 h-4.5 text-primary" />
-            </div>
-            <p className="font-heading font-semibold text-foreground text-[14px] mb-1">{r.title}</p>
-            <p className="text-muted-foreground text-[13px] leading-relaxed">{r.description}</p>
-          </motion.div>
-        ))}
+    <section className="py-20 px-5 bg-gradient-to-b from-background to-primary/5">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-[12px] font-semibold text-primary uppercase tracking-widest mb-3">Why Vetter</p>
+          <h2 className="font-heading font-bold text-foreground text-[28px] sm:text-[36px] leading-tight">
+            Stop getting burned on Marketplace
+          </h2>
+          <p className="text-muted-foreground text-[15px] mt-3 max-w-md mx-auto">
+            Every day, buyers lose money to deceptive listings. Vetter changes that.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-5">
+          {benefits.map((b, i) => {
+            const Icon = b.icon;
+            return (
+              <div key={i} className="flex items-start gap-4 p-5 bg-card rounded-2xl border border-border/60 shadow-sm">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${b.color}`}>
+                  <Icon className="w-4.5 h-4.5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold text-foreground text-[15px] mb-1">{b.title}</h3>
+                  <p className="text-muted-foreground text-[13px] leading-relaxed">{b.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

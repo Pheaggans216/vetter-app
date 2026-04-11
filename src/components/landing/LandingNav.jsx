@@ -1,25 +1,28 @@
-import { Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
 export default function LandingNav() {
   return (
-    <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur border-b border-border/40">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/40">
       <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-8 w-auto" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to="/vetter/onboarding">
-            <Button variant="ghost" size="sm" className="text-[13px] text-muted-foreground hidden sm:flex">
-              Become a Vetter
-            </Button>
+        <img
+          src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png"
+          alt="Vetter"
+          className="h-8 w-auto"
+        />
+        <div className="flex items-center gap-4">
+          <a href="#how-it-works" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
+            How it Works
+          </a>
+          <Link to="/vetter/onboarding" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
+            Become a Vetter
           </Link>
-          <Link to="/requests/new">
-            <Button size="sm" className="rounded-lg h-8 px-4 text-[13px] font-semibold">
-              Request a Vetter
-            </Button>
-          </Link>
+          <button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="h-8 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Sign Up
+          </button>
         </div>
       </div>
     </nav>

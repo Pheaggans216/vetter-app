@@ -1,55 +1,55 @@
-import { ArrowRight, ShieldCheck, Star, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-
-const stats = [
-  { icon: UserCheck, label: "ID-verified professionals" },
-  { icon: Star, label: "4.9 avg. buyer rating" },
-  { icon: ShieldCheck, label: "Background-checked Vetters" },
-];
+import { ShieldCheck, ArrowRight, ChevronDown } from "lucide-react";
 
 export default function LandingHero() {
   return (
-    <section className="max-w-5xl mx-auto px-5 pt-16 pb-20 text-center">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-6">
+    <section className="relative overflow-hidden">
+      {/* Gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-background to-accent/8 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative max-w-3xl mx-auto px-5 pt-20 pb-20 text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8">
           <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[12px] font-medium text-primary">Real-world verification for online listings</span>
+          <span className="text-[12px] font-semibold text-primary">Trusted Verification Platform</span>
         </div>
 
-        <h1 className="text-[42px] sm:text-[56px] leading-[1.1] font-heading font-bold text-foreground mb-5 tracking-tight">
-          Verify before<br className="hidden sm:block" /> you buy.
+        {/* Headline */}
+        <h1 className="font-heading font-bold text-foreground text-[38px] sm:text-[52px] leading-[1.1] tracking-tight mb-5">
+          Buy anything safely.{" "}
+          <span className="text-primary">Get it Vetted</span>{" "}
+          first.
         </h1>
 
-        <p className="text-[17px] text-muted-foreground leading-relaxed max-w-[520px] mx-auto mb-8">
-          Vetter sends trusted local professionals to inspect online marketplace items
-          before money changes hands. Buy with confidence.
+        {/* Subheadline */}
+        <p className="text-muted-foreground text-[17px] sm:text-[19px] leading-relaxed mb-10 max-w-xl mx-auto">
+          Local experts verify items before you pay—no more scams, no more regrets.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
-          <Link to="/requests/new">
-            <Button size="lg" className="rounded-xl h-12 px-7 text-[15px] font-semibold shadow-sm w-full sm:w-auto">
-              Request a Vetter
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            to="/requests/new"
+            className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
+          >
+            Request a Vetter
+            <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/vetter/onboarding">
-            <Button variant="outline" size="lg" className="rounded-xl h-12 px-7 text-[15px] w-full sm:w-auto">
-              Become a Vetter
-            </Button>
-          </Link>
+          <a
+            href="#how-it-works"
+            className="inline-flex items-center gap-2 h-13 px-6 py-3.5 rounded-xl border border-border bg-card text-[15px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+          >
+            How it works
+            <ChevronDown className="w-4 h-4" />
+          </a>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-          {stats.map((s) => (
-            <div key={s.label} className="flex items-center gap-2 text-muted-foreground">
-              <s.icon className="w-4 h-4 text-accent" />
-              <span className="text-[13px]">{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+        {/* Social proof micro-copy */}
+        <p className="text-[12px] text-muted-foreground mt-6">
+          ✓ No credit card required &nbsp;&nbsp;✓ Available in your city &nbsp;&nbsp;✓ 5-star vetters
+        </p>
+      </div>
     </section>
   );
 }
