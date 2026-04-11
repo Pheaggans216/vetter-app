@@ -32,6 +32,7 @@ import AdminDisputes from '@/pages/admin/AdminDisputes';
 import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminFlagged from '@/pages/admin/AdminFlagged';
 import AdminMetrics from '@/pages/admin/AdminMetrics';
+import SiteMap from '@/pages/admin/SiteMap';
 import Referrals from '@/pages/Referrals';
 
 const AuthenticatedApp = () => {
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/payments" element={<AdminPayments />} />
         <Route path="/admin/flagged" element={<AdminFlagged />} />
         <Route path="/admin/metrics" element={<AdminMetrics />} />
+        <Route path="/admin/sitemap" element={<SiteMap />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import {
   LayoutDashboard, Users, ClipboardList, ShieldAlert,
-  CreditCard, BarChart2, Shield, LogOut, ChevronRight
+  CreditCard, BarChart2, Shield, LogOut, ChevronRight, Map
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ const navItems = [
   { label: "Payments", icon: CreditCard, path: "/admin/payments" },
   { label: "Flagged Users", icon: ShieldAlert, path: "/admin/flagged" },
   { label: "Metrics", icon: BarChart2, path: "/admin/metrics" },
+  { label: "Site Map", icon: Map, path: "/admin/sitemap" },
 ];
 
 export default function AdminLayout() {
