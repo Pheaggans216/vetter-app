@@ -54,12 +54,7 @@ export default function Onboarding() {
         className="flex-1"
       >
         <div className="flex items-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-primary" />
-          </div>
-          <h1 className="text-2xl font-heading font-bold text-foreground tracking-tight">
-            Vetter
-          </h1>
+          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-10 w-auto" />
         </div>
 
         <h2 className="text-[24px] font-heading font-bold text-foreground mb-2">

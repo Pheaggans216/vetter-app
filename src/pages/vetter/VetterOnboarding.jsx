@@ -103,10 +103,7 @@ export default function VetterOnboarding() {
       {/* Header */}
       <div className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Shield className="w-4 h-4 text-primary" />
-          </div>
-          <span className="font-heading font-bold text-foreground text-lg">Vetter</span>
+          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-9 w-auto" />
         </div>
 
         {/* Progress */}
