@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import PullToRefresh from "@/components/ui/PullToRefresh";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -120,8 +121,7 @@ export default function Jobs() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Jobs assigned to this vetter (matched/awaiting confirmation)
-  const { data: myJobs = [], isLoading } = useQuery({
+  const { data: myJobs = [], isLoading, refetch } = useQuery({
     queryKey: ["jobs-mine", user?.email],
     queryFn: () => base44.entities.VettingRequest.filter({ vetter_email: user?.email }, "-created_date"),
     enabled: !!user?.email,
@@ -141,11 +141,7 @@ export default function Jobs() {
       base44.entities.VettingRequest.update(job.id, { vetter_email: null, status: "pending" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs-mine"] });
-      toast({
-        title: "Job declined",
-        description: "The buyer will be matched with another Vetter.",
-        variant: "destructive",
-      });
+      toast({ title: "Job declined", description: "The buyer will be matched with another Vetter.", variant: "destructive" });
     },
   });
 
@@ -155,68 +151,70 @@ export default function Jobs() {
   const actionPending = acceptMutation.isPending || declineMutation.isPending;
 
   return (
-    <div className="px-5 pt-6 pb-4">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-heading font-bold text-foreground">Jobs</h1>
-        {pending.length > 0 && (
-          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-[11px] font-bold text-primary-foreground">{pending.length}</span>
-          </div>
-        )}
+    <PullToRefresh onRefresh={refetch}>
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-xl font-heading font-bold text-foreground">Jobs</h1>
+          {pending.length > 0 && (
+            <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-[11px] font-bold text-primary-foreground">{pending.length}</span>
+            </div>
+          )}
+        </div>
+
+        <Tabs defaultValue="pending">
+          <TabsList className="w-full rounded-xl mb-5 h-10">
+            <TabsTrigger value="pending" className="flex-1 text-[12px]">
+              New {pending.length > 0 && `(${pending.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="active" className="flex-1 text-[12px]">
+              Active {active.length > 0 && `(${active.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="flex-1 text-[12px]">Done</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="pending">
+            {isLoading ? (
+              <div className="space-y-3">{[1, 2].map((i) => <div key={i} className="h-28 bg-card rounded-2xl animate-pulse" />)}</div>
+            ) : pending.length === 0 ? (
+              <EmptyState message="No new job requests right now." />
+            ) : (
+              <div className="space-y-3">
+                {pending.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    showActions={true}
+                    onAccept={(j) => acceptMutation.mutate(j)}
+                    onDecline={(j) => declineMutation.mutate(j)}
+                    actionPending={actionPending}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="active">
+            {active.length === 0 ? (
+              <EmptyState message="No active jobs. Accept a job from the New tab." />
+            ) : (
+              <div className="space-y-3">
+                {active.map((job) => <JobCard key={job.id} job={job} showActions={false} />)}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="completed">
+            {completed.length === 0 ? (
+              <EmptyState message="Completed jobs will appear here." />
+            ) : (
+              <div className="space-y-3">
+                {completed.map((job) => <JobCard key={job.id} job={job} showActions={false} />)}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="pending">
-        <TabsList className="w-full rounded-xl mb-5 h-10">
-          <TabsTrigger value="pending" className="flex-1 text-[12px]">
-            New {pending.length > 0 && `(${pending.length})`}
-          </TabsTrigger>
-          <TabsTrigger value="active" className="flex-1 text-[12px]">
-            Active {active.length > 0 && `(${active.length})`}
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="flex-1 text-[12px]">Done</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="pending">
-          {isLoading ? (
-            <div className="space-y-3">{[1, 2].map((i) => <div key={i} className="h-28 bg-card rounded-2xl animate-pulse" />)}</div>
-          ) : pending.length === 0 ? (
-            <EmptyState message="No new job requests right now." />
-          ) : (
-            <div className="space-y-3">
-              {pending.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  showActions={true}
-                  onAccept={(j) => acceptMutation.mutate(j)}
-                  onDecline={(j) => declineMutation.mutate(j)}
-                  actionPending={actionPending}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="active">
-          {active.length === 0 ? (
-            <EmptyState message="No active jobs. Accept a job from the New tab." />
-          ) : (
-            <div className="space-y-3">
-              {active.map((job) => <JobCard key={job.id} job={job} showActions={false} />)}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="completed">
-          {completed.length === 0 ? (
-            <EmptyState message="Completed jobs will appear here." />
-          ) : (
-            <div className="space-y-3">
-              {completed.map((job) => <JobCard key={job.id} job={job} showActions={false} />)}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+    </PullToRefresh>
   );
 }

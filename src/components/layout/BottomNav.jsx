@@ -22,7 +22,7 @@ export default function BottomNav({ userRole }) {
   const tabs = userRole === "vetter" ? vetterTabs : buyerTabs;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-1">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path || 

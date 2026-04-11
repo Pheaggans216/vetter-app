@@ -2,6 +2,12 @@ import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,9 +31,15 @@ const menuItems = [
 export default function Profile() {
   const { user } = useAuth();
   const role = user?.role || "buyer";
+  const [deleting, setDeleting] = useState(false);
 
   const handleLogout = () => {
     base44.auth.logout();
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    await base44.auth.logout();
   };
 
   return (
@@ -95,11 +107,38 @@ export default function Profile() {
       <Button
         variant="outline"
         onClick={handleLogout}
-        className="w-full rounded-xl h-11 text-destructive border-destructive/20 hover:bg-destructive/5 font-medium"
+        className="w-full rounded-xl h-11 text-destructive border-destructive/20 hover:bg-destructive/5 font-medium mb-3"
       >
         <LogOut className="w-4 h-4 mr-2" />
         Sign Out
       </Button>
+
+      {/* Delete Account */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button className="w-full text-center text-[12px] text-muted-foreground/60 hover:text-destructive transition-colors py-1">
+            Delete Account
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action is permanent and cannot be undone. All your data, requests, and history will be removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Yes, delete my account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
