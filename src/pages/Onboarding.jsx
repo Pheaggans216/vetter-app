@@ -54,7 +54,7 @@ export default function Onboarding() {
         className="flex-1"
       >
         <div className="flex items-center gap-2 mb-8">
-          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-10 w-auto" />
+          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-13 w-auto" style={{ mixBlendMode: 'multiply' }} />
         </div>
 
         <h2 className="text-[24px] font-heading font-bold text-foreground mb-2">

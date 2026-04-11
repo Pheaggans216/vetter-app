@@ -103,7 +103,7 @@ export default function VetterOnboarding() {
       {/* Header */}
       <div className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2 mb-6">
-          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-9 w-auto" />
+          <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-12 w-auto" style={{ mixBlendMode: 'multiply' }} />
         </div>
 
         {/* Progress */}

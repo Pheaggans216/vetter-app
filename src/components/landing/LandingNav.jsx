@@ -8,7 +8,8 @@ export default function LandingNav() {
         <img
           src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png"
           alt="Vetter"
-          className="h-8 w-auto"
+          className="h-11 w-auto"
+          style={{ mixBlendMode: 'multiply' }}
         />
         <div className="flex items-center gap-4">
           <a href="#how-it-works" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
