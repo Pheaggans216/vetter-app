@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { useState } from "react";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -121,6 +123,25 @@ export default function Jobs() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const { data: vetterProfile } = useQuery({
+    queryKey: ["vetter-profile-me", user?.email],
+    queryFn: async () => {
+      const profiles = await base44.entities.VetterProfile.filter({ user_email: user?.email });
+      return profiles[0] || null;
+    },
+    enabled: !!user?.email,
+  });
+
+  const availabilityMutation = useMutation({
+    mutationFn: (available) => base44.entities.VetterProfile.update(vetterProfile.id, { available }),
+    onSuccess: (_, available) => {
+      queryClient.invalidateQueries({ queryKey: ["vetter-profile-me"] });
+      toast({ title: available ? "You're now available" : "You're now offline", description: available ? "You can receive new requests." : "You won't receive new requests." });
+    },
+  });
+
+  const isAvailable = vetterProfile?.available !== false;
+
   const { data: myJobs = [], isLoading, refetch } = useQuery({
     queryKey: ["jobs-mine", user?.email],
     queryFn: () => base44.entities.VettingRequest.filter({ vetter_email: user?.email }, "-created_date"),
@@ -153,6 +174,36 @@ export default function Jobs() {
   return (
     <PullToRefresh onRefresh={refetch}>
       <div className="px-5 pt-6 pb-4">
+        {/* Availability Toggle */}
+        {vetterProfile && (
+          <div className={cn(
+            "flex items-center justify-between px-4 py-3 rounded-2xl border-2 mb-5 transition-all",
+            isAvailable ? "bg-chart-3/10 border-chart-3/30" : "bg-muted/50 border-border/60"
+          )}>
+            <div>
+              <p className="font-heading font-semibold text-foreground text-[15px]">
+                {isAvailable ? "Available" : "Offline"}
+              </p>
+              <p className="text-[12px] text-muted-foreground">
+                {isAvailable ? "You can receive new requests" : "You're hidden from requests"}
+              </p>
+            </div>
+            <button
+              onClick={() => availabilityMutation.mutate(!isAvailable)}
+              disabled={availabilityMutation.isPending}
+              className={cn(
+                "relative w-14 h-7 rounded-full transition-colors duration-200 focus:outline-none",
+                isAvailable ? "bg-chart-3" : "bg-muted-foreground/30"
+              )}
+            >
+              <span className={cn(
+                "absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-200",
+                isAvailable ? "translate-x-7" : "translate-x-0.5"
+              )} />
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-5">
           <h1 className="text-xl font-heading font-bold text-foreground">Jobs</h1>
           {pending.length > 0 && (
