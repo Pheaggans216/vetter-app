@@ -49,7 +49,8 @@ const RECOMMENDATION_CONFIG = {
 };
 
 export default function ReportView() {
-  const requestId = window.location.pathname.split("/").pop();
+  // Path is /requests/:id/report — need second-to-last segment, not last
+  const requestId = window.location.pathname.split("/").slice(-2)[0];
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["report", requestId],
