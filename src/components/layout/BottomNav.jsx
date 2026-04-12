@@ -21,7 +21,7 @@ const vetterTabs = [
 
 export default function BottomNav({ userRole }) {
   const location = useLocation();
-  const tabs = userRole === "vetter" ? vetterTabs : buyerTabs;
+  const tabs = (userRole === "vetter" || userRole === "admin") ? vetterTabs : buyerTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>

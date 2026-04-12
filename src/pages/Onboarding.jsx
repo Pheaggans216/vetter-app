@@ -42,7 +42,11 @@ export default function Onboarding() {
     await base44.auth.updateMe({ role: selectedRole, onboarded: true });
     await refreshUser();
     setSaving(false);
-    navigate("/");
+    if (selectedRole === "vetter") {
+      navigate("/vetter/onboarding");
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (

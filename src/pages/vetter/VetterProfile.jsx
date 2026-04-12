@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, Star, MapPin, Clock, Briefcase, Award,
-  CheckCircle2, User, Zap, Wrench, ClipboardCheck, ToggleLeft, ToggleRight
+  CheckCircle2, User, Zap, Wrench, ClipboardCheck, ToggleLeft, ToggleRight,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -79,6 +80,13 @@ export default function VetterProfile() {
 
   return (
     <div className="pb-8">
+      {/* Account settings link */}
+      <div className="px-5 pt-4 flex justify-end">
+        <Link to="/profile" className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors">
+          <Settings className="w-3.5 h-3.5" />
+          Account Settings
+        </Link>
+      </div>
       {/* Hero */}
       <div className="px-5 pt-6 pb-5 bg-card border-b border-border/60">
         <div className="flex items-start gap-4 mb-4">
