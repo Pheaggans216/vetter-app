@@ -9,10 +9,12 @@ import RequestCard from "@/components/requests/RequestCard";
 
 export default function Requests() {
   const { user } = useAuth();
+  const isSeller = user?.app_role === "seller";
+  const filterKey = isSeller ? "seller_email" : "buyer_email";
 
   const { data: requests = [], isLoading, refetch } = useQuery({
     queryKey: ["vetting-requests", user?.email],
-    queryFn: () => base44.entities.VettingRequest.filter({ buyer_email: user?.email }, "-created_date"),
+    queryFn: () => base44.entities.VettingRequest.filter({ [filterKey]: user?.email }, "-created_date"),
     enabled: !!user?.email,
   });
 

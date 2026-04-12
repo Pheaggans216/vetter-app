@@ -46,11 +46,14 @@ export default function NewRequest() {
     },
   });
 
+  const isSeller = user?.app_role === "seller";
+
   const handleSubmit = () => {
     mutation.mutate({
       ...form,
       listing_price: form.listing_price ? Number(form.listing_price) : undefined,
-      buyer_email: user?.email,
+      buyer_email: isSeller ? undefined : user?.email,
+      seller_email: isSeller ? user?.email : undefined,
       status: "pending",
       service_type: "standard_verification",
     });
