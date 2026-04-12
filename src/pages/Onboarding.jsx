@@ -57,7 +57,7 @@ export default function Onboarding() {
       } else if (selectedRole === "seller") {
         navigate("/dashboard/seller");
       } else {
-        navigate("/dashboard");
+        navigate("/dashboard/buyer");
       }
     } catch (err) {
       clearTimeout(timeout);
