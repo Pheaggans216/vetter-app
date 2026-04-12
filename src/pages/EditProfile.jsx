@@ -119,11 +119,11 @@ export default function EditProfile() {
           <label className="block text-[13px] font-semibold text-foreground mb-1.5">Email</label>
           <input
             type="email"
-            value={user?.email || ""}
+            value={user?.email ?? "Loading..."}
             readOnly
             className="w-full h-12 px-4 rounded-xl border border-border bg-muted text-[14px] text-muted-foreground cursor-not-allowed"
           />
-          <p className="text-[11px] text-muted-foreground mt-1 pl-1">Email cannot be changed here.</p>
+          <p className="text-[11px] text-muted-foreground mt-1 pl-1">Email is tied to your login and cannot be changed here.</p>
         </div>
 
         <Field label="Phone Number" value={form.phone} onChange={(v) => update("phone", v)} placeholder="+1 (555) 000-0000" type="tel" />
