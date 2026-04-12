@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Link } from "react-router-dom";
@@ -43,13 +44,16 @@ export default function BuyerDashboard() {
             {firstName} 👋
           </h1>
         </div>
-        <Link to="/profile">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-border/60">
-            <span className="text-primary font-bold text-[15px]">
-              {user?.full_name?.[0]?.toUpperCase() || "U"}
-            </span>
-          </div>
-        </Link>
+        <div className="flex items-center gap-2">
+          <NotificationBell />
+          <Link to="/profile">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-border/60">
+              <span className="text-primary font-bold text-[15px]">
+                {user?.full_name?.[0]?.toUpperCase() || "U"}
+              </span>
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Quick action — new request */}

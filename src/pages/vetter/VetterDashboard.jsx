@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Link } from "react-router-dom";
@@ -88,17 +89,20 @@ export default function VetterDashboard() {
             Hey, {firstName} 👋
           </h1>
         </div>
-        <Link to="/vetter/profile">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-border/60">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-full h-full rounded-xl object-cover" />
-            ) : (
-              <span className="text-primary font-bold text-[15px]">
-                {profile.display_name?.[0]?.toUpperCase() || "V"}
-              </span>
-            )}
-          </div>
-        </Link>
+        <div className="flex items-center gap-2">
+          <NotificationBell />
+          <Link to="/vetter/profile">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-border/60">
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-full h-full rounded-xl object-cover" />
+              ) : (
+                <span className="text-primary font-bold text-[15px]">
+                  {profile.display_name?.[0]?.toUpperCase() || "V"}
+                </span>
+              )}
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Application status */}
