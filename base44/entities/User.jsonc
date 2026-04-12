@@ -21,6 +21,12 @@
     "state": {
       "type": "string"
     },
+    "zip_code": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
     "avatar_url": {
       "type": "string"
     },
@@ -28,5 +34,6 @@
       "type": "boolean",
       "default": false
     }
-  }
+  },
+  "required": []
 }
