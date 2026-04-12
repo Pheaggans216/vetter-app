@@ -34,18 +34,35 @@ const roles = [
 export default function Onboarding() {
   const [selectedRole, setSelectedRole] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
 
   const handleContinue = async () => {
     setSaving(true);
-    await base44.auth.updateMe({ role: selectedRole, onboarded: true });
-    await refreshUser();
-    setSaving(false);
-    if (selectedRole === "vetter") {
-      navigate("/vetter/onboarding");
-    } else {
-      navigate("/dashboard");
+    setError(null);
+
+    const timeout = setTimeout(() => {
+      setSaving(false);
+      setError("This is taking too long. Please try again.");
+    }, 8000);
+
+    try {
+      await base44.auth.updateMe({ role: selectedRole, onboarded: true });
+      await refreshUser();
+      clearTimeout(timeout);
+      setSaving(false);
+      if (selectedRole === "vetter") {
+        navigate("/vetter/onboarding");
+      } else if (selectedRole === "seller") {
+        navigate("/dashboard/seller");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      clearTimeout(timeout);
+      setSaving(false);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -101,6 +118,12 @@ export default function Onboarding() {
           })}
         </div>
       </motion.div>
+
+      {error && (
+        <div className="mt-4 px-4 py-3 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-[13px] text-center">
+          {error}
+        </div>
+      )}
 
       <Button
         onClick={handleContinue}

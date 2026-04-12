@@ -42,6 +42,7 @@ import EditProfile from '@/pages/EditProfile';
 import BuyerDashboard from '@/pages/BuyerDashboard';
 import VetterDashboard from '@/pages/vetter/VetterDashboard';
 import SmartRedirect from '@/components/SmartRedirect';
+import SellerDashboard from '@/pages/SellerDashboard';
 import Chat from '@/pages/Chat';
 
 // Decides what to show at "/" — landing for guests, smart redirect for members
@@ -81,7 +82,10 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<RootRoute />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<BuyerDashboard />} />
+        <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
+        <Route path="/dashboard/seller" element={<SellerDashboard />} />
         <Route path="/vetter/dashboard" element={<VetterDashboard />} />
+        <Route path="/dashboard/vetter" element={<VetterDashboard />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />

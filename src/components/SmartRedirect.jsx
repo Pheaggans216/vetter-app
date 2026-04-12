@@ -37,6 +37,8 @@ export default function SmartRedirect() {
       navigate("/admin", { replace: true });
     } else if (hasVetterProfile || user?.role === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
+    } else if (user?.role === "seller") {
+      navigate("/dashboard/seller", { replace: true });
     } else {
       navigate("/dashboard", { replace: true });
     }
