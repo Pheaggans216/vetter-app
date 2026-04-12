@@ -3,7 +3,7 @@ import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, M
 import { cn } from "@/lib/utils";
 
 const buyerTabs = [
-  { label: "Home", icon: Home, path: "/home" },
+  { label: "Home", icon: Home, path: "/dashboard" },
   { label: "Requests", icon: FileText, path: "/requests" },
   { label: "Find Vetters", icon: MapPin, path: "/map" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
@@ -11,6 +11,7 @@ const buyerTabs = [
 ];
 
 const vetterTabs = [
+  { label: "Home", icon: Home, path: "/vetter/dashboard" },
   { label: "Jobs", icon: Briefcase, path: "/jobs" },
   { label: "Schedule", icon: Calendar, path: "/schedule" },
   { label: "Earnings", icon: DollarSign, path: "/earnings" },

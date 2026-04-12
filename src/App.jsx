@@ -39,6 +39,17 @@ import AdminMetrics from '@/pages/admin/AdminMetrics';
 import SiteMap from '@/pages/admin/SiteMap';
 import Referrals from '@/pages/Referrals';
 import EditProfile from '@/pages/EditProfile';
+import BuyerDashboard from '@/pages/BuyerDashboard';
+import VetterDashboard from '@/pages/vetter/VetterDashboard';
+import SmartRedirect from '@/components/SmartRedirect';
+
+// Decides what to show at "/" — landing for guests, smart redirect for members
+function RootRoute() {
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+  if (isLoadingAuth) return null;
+  if (isAuthenticated) return <SmartRedirect />;
+  return <Landing />;
+}
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -66,7 +77,11 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<RootRoute />} />
+      <Route element={<AppLayout />}>
+        <Route path="/dashboard" element={<BuyerDashboard />} />
+        <Route path="/vetter/dashboard" element={<VetterDashboard />} />
+      </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
       <Route path="/vetter/application-received" element={<ApplicationReceived />} />
