@@ -70,12 +70,12 @@ export default function SplashScreen({ onDone, navLogoRef }) {
               <motion.img
                 src={LOGO_URL}
                 alt="Vetter"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, ease: "linear", repeat: Infinity }}
                 style={{
                   width: "min(45vw, 45vh)",
                   height: "auto",
-                  filter:
-                    "brightness(0) invert(1) drop-shadow(0 0 32px rgba(100,160,255,0.5))",
-                  animation: "vetter-spin 3s linear infinite",
+                  filter: "brightness(0) invert(1) drop-shadow(0 0 32px rgba(100,160,255,0.5))",
                 }}
               />
             </motion.div>
@@ -117,13 +117,7 @@ export default function SplashScreen({ onDone, navLogoRef }) {
         </motion.div>
       )}
 
-      <style>{`
-        @keyframes vetter-spin {
-          0%   { filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(100,160,255,0.4)); transform: rotate(0deg); }
-          50%  { filter: brightness(0) invert(1) drop-shadow(0 0 44px rgba(100,190,255,0.7)); transform: rotate(180deg); }
-          100% { filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(100,160,255,0.4)); transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{``}</style>
     </AnimatePresence>
   );
 }

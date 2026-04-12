@@ -122,12 +122,21 @@ const AuthenticatedApp = () => {
 
 
 function App() {
-  const [splashDone, setSplashDone] = useState(false);
+  const [splashDone, setSplashDone] = useState(() => {
+    // Only show splash once per session
+    if (sessionStorage.getItem('splashShown')) return true;
+    return false;
+  });
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem('splashShown', '1');
+    setSplashDone(true);
+  };
 
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} navLogoRef={navLogoRef} />}
+        {!splashDone && <SplashScreen onDone={handleSplashDone} navLogoRef={navLogoRef} />}
         <Router>
           <AuthenticatedApp />
         </Router>
