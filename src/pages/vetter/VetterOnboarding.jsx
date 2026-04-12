@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -11,23 +11,16 @@ import StepAvailability from "@/components/vetter-onboarding/StepAvailability";
 import StepRoles from "@/components/vetter-onboarding/StepRoles";
 import StepSecureExchange from "@/components/vetter-onboarding/StepSecureExchange";
 import StepReview from "@/components/vetter-onboarding/StepReview";
-import { Shield } from "lucide-react";
 
-const BASE_STEPS = [
-  "Roles",
-  "Specialties",
-  "Documents",
-  "Experience",
-  "Location",
-  "Availability",
-  "Review",
-];
+const BASE_STEPS = ["Roles", "Specialties", "Documents", "Experience", "Location", "Availability", "Review"];
 
 export default function VetterOnboarding() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [checking, setChecking] = useState(true);
   const [profile, setProfile] = useState({
     display_name: user?.full_name || "",
     bio: "",
@@ -51,9 +44,22 @@ export default function VetterOnboarding() {
     },
   });
 
+  // Guard: redirect if profile already exists
+  useEffect(() => {
+    if (!user?.email) return;
+    base44.entities.VetterProfile.filter({ user_email: user.email })
+      .then((existing) => {
+        if (existing.length > 0) {
+          navigate("/vetter/profile", { replace: true });
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => setChecking(false));
+  }, [user?.email]);
+
   const update = (fields) => setProfile((prev) => ({ ...prev, ...fields }));
 
-  // Dynamically compute steps based on selected roles
   const hasSecureExchange = profile.service_types?.includes("secure_exchange_presence");
   const STEPS = hasSecureExchange
     ? ["Roles", "Specialties", "Secure Exchange", "Documents", "Experience", "Location", "Availability", "Review"]
@@ -61,6 +67,7 @@ export default function VetterOnboarding() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setSubmitError(null);
     try {
       await base44.entities.VetterProfile.create({
         ...profile,
@@ -68,17 +75,26 @@ export default function VetterOnboarding() {
         years_of_experience: Number(profile.years_of_experience) || 0,
         service_radius_miles: Number(profile.service_radius_miles) || 25,
         status: "pending_review",
+        available: true,
         secure_exchange_approved: false,
-        certified_specialist: profile.service_types?.includes("specialist_vetting") ? true : undefined,
+        certified_specialist: profile.service_types?.includes("specialist_vetting") || false,
       });
       await base44.auth.updateMe({ role: "vetter", onboarded: true });
       await refreshUser();
       navigate("/vetter/application-received");
     } catch (err) {
       setSubmitting(false);
-      alert("Submission failed. Please try again.");
+      setSubmitError(err?.message || "Submission failed. Please try again.");
     }
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const stepProps = { profile, update };
 
@@ -94,14 +110,14 @@ export default function VetterOnboarding() {
         <StepReview {...stepProps} onSubmit={handleSubmit} submitting={submitting} />,
       ]
     : [
-    <StepRoles {...stepProps} />,
-    <StepSpecialties {...stepProps} />,
-    <StepDocuments {...stepProps} />,
-    <StepExperience {...stepProps} />,
-    <StepLocation {...stepProps} />,
-    <StepAvailability {...stepProps} />,
-    <StepReview {...stepProps} onSubmit={handleSubmit} submitting={submitting} />,
-  ];
+        <StepRoles {...stepProps} />,
+        <StepSpecialties {...stepProps} />,
+        <StepDocuments {...stepProps} />,
+        <StepExperience {...stepProps} />,
+        <StepLocation {...stepProps} />,
+        <StepAvailability {...stepProps} />,
+        <StepReview {...stepProps} onSubmit={handleSubmit} submitting={submitting} />,
+      ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
@@ -110,13 +126,9 @@ export default function VetterOnboarding() {
         <div className="flex items-center gap-2 mb-6">
           <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-12 w-auto" style={{ mixBlendMode: 'multiply' }} />
         </div>
-
-        {/* Progress */}
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1.5">
-            <p className="text-[12px] text-muted-foreground font-medium">
-              Step {step + 1} of {STEPS.length}
-            </p>
+            <p className="text-[12px] text-muted-foreground font-medium">Step {step + 1} of {STEPS.length}</p>
             <p className="text-[12px] text-muted-foreground">{STEPS[step]}</p>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -143,6 +155,13 @@ export default function VetterOnboarding() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Error message */}
+      {submitError && (
+        <div className="mx-5 mb-2 px-4 py-3 bg-destructive/10 border border-destructive/30 rounded-xl text-[13px] text-destructive">
+          {submitError}
+        </div>
+      )}
 
       {/* Navigation */}
       {step < STEPS.length - 1 && (

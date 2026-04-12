@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, Star, MapPin, Clock, Briefcase, Award,
-  CheckCircle2, Edit, User, Zap, Wrench, ClipboardCheck
+  CheckCircle2, User, Zap, Wrench, ClipboardCheck, ToggleLeft, ToggleRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -23,22 +23,17 @@ const SERVICE_LABELS = {
   secure_exchange_presence: "Secure Exchange Presence",
 };
 
-// Role-based profile badges (shown when role is active)
-const ROLE_BADGES = [
-  { key: "standard", serviceKey: "standard_verification", label: "Verified Vetter", icon: ClipboardCheck, color: "bg-primary/10 text-primary border-primary/20" },
-  { key: "specialist", serviceKey: "specialist_vetting", label: "Certified Specialist", icon: Wrench, color: "bg-accent/15 text-accent border-accent/20" },
-  { key: "secure", serviceKey: "secure_exchange_presence", label: "Secure Exchange Provider", icon: ShieldCheck, color: "bg-chart-3/15 text-chart-3 border-chart-3/20" },
-];
-
-const STATUS_BADGES = [
-  { key: "identity_verified", label: "Identity Verified", icon: User, color: "bg-primary/10 text-primary border-primary/20" },
-  { key: "background_checked", label: "Background Checked", icon: ShieldCheck, color: "bg-accent/15 text-accent border-accent/20" },
-  { key: "certified_specialist", label: "Certified Specialist", icon: Award, color: "bg-chart-3/15 text-chart-3 border-chart-3/20" },
-  { key: "secure_exchange_approved", label: "Secure Exchange Approved", icon: Zap, color: "bg-chart-4/10 text-chart-4 border-chart-4/20" },
-];
+const STATUS_CONFIG = {
+  pending_review: { label: "Pending Review", color: "bg-amber-50 border-amber-200 text-amber-700", emoji: "🕐" },
+  active: { label: "Active", color: "bg-green-50 border-green-200 text-green-700", emoji: "✅" },
+  inactive: { label: "Inactive", color: "bg-muted border-border text-muted-foreground", emoji: "⏸" },
+  approved: { label: "Approved", color: "bg-green-50 border-green-200 text-green-700", emoji: "✅" },
+  rejected: { label: "Rejected", color: "bg-red-50 border-red-200 text-red-700", emoji: "❌" },
+};
 
 export default function VetterProfile() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ["vetter-profile", user?.email],
@@ -47,6 +42,11 @@ export default function VetterProfile() {
   });
 
   const profile = profiles[0];
+
+  const availabilityMutation = useMutation({
+    mutationFn: (available) => base44.entities.VetterProfile.update(profile.id, { available }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vetter-profile"] }),
+  });
 
   if (isLoading) {
     return (
@@ -73,7 +73,9 @@ export default function VetterProfile() {
     );
   }
 
-  const activeBadges = STATUS_BADGES.filter((b) => profile[b.key]);
+  const statusCfg = STATUS_CONFIG[profile.status] || STATUS_CONFIG["pending_review"];
+  const isApproved = profile.status === "active" || profile.status === "approved";
+  const isAvailable = profile.available !== false;
 
   return (
     <div className="pb-8">
@@ -90,67 +92,72 @@ export default function VetterProfile() {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h1 className="font-heading font-bold text-foreground text-[18px]">{profile.display_name}</h1>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-[13px] text-muted-foreground">
-                    {[profile.city, profile.state].filter(Boolean).join(", ") || "Location not set"}
-                  </span>
-                </div>
-              </div>
-              <Link to="/vetter/onboarding">
-                <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 shrink-0">
-                  <Edit className="w-4 h-4" />
-                </Button>
-              </Link>
+            <h1 className="font-heading font-bold text-foreground text-[18px]">{profile.display_name}</h1>
+            <div className="flex items-center gap-1 mt-0.5">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-[13px] text-muted-foreground">
+                {[profile.city, profile.state].filter(Boolean).join(", ") || "Location not set"}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Role badges */}
-        {profile.service_types?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {ROLE_BADGES.filter(b => profile.service_types?.includes(b.serviceKey)).map(b => (
-              <div key={b.key} className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold", b.color)}>
-                <b.icon className="w-3 h-3" />
-                {b.label}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <StatBox value={profile.rating?.toFixed(1) || "—"} label="Rating" icon={Star} />
-          <StatBox value={profile.total_inspections || 0} label="Inspections" icon={CheckCircle2} />
-          <StatBox value={profile.avg_response_time || "< 2h"} label="Response" icon={Clock} />
+        {/* Application status badge */}
+        <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[12px] font-semibold mb-4", statusCfg.color)}>
+          <span>{statusCfg.emoji}</span>
+          Application: {statusCfg.label}
         </div>
 
-        {/* Verification badges */}
-        {activeBadges.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {activeBadges.map((b) => (
-              <div key={b.key} className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold", b.color)}>
-                <b.icon className="w-3 h-3" />
-                {b.label}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {profile.status === "pending_review" && (
-          <div className="mt-3 px-3 py-2 bg-muted rounded-xl">
-            <p className="text-[12px] text-muted-foreground text-center">
-              🕐 Your profile is under review. Expect approval within 24–48 hours.
+        {/* Availability toggle — always visible, only enabled when approved */}
+        <div className={cn(
+          "flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all",
+          isAvailable && isApproved ? "bg-green-50 border-green-200" : "bg-muted/50 border-border/60"
+        )}>
+          <div>
+            <p className="font-heading font-semibold text-foreground text-[14px]">
+              {isApproved ? (isAvailable ? "Available for jobs" : "Offline") : "Availability"}
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              {isApproved ? "Toggle to receive new requests" : "Available after approval"}
             </p>
           </div>
-        )}
+          <button
+            onClick={() => isApproved && availabilityMutation.mutate(!isAvailable)}
+            disabled={!isApproved || availabilityMutation.isPending}
+            className={cn(
+              "relative w-12 h-6 rounded-full transition-colors duration-200",
+              isApproved && isAvailable ? "bg-green-500" : "bg-muted-foreground/30",
+              !isApproved && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            <span className={cn(
+              "absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200",
+              isAvailable ? "translate-x-6" : "translate-x-0.5"
+            )} />
+          </button>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          <StatBox value={profile.rating?.toFixed(1) || "—"} label="Rating" />
+          <StatBox value={profile.total_inspections || 0} label="Inspections" />
+          <StatBox value={profile.avg_response_time || "—"} label="Response" />
+        </div>
       </div>
 
       {/* Body */}
       <div className="px-5 pt-5 space-y-4">
+        {/* Onboarding completion summary */}
+        <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm space-y-2">
+          <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2.5">Profile Completion</p>
+          <CompletionRow label="Name" done={!!profile.display_name} />
+          <CompletionRow label="Location" done={!!(profile.city || profile.zip_code)} />
+          <CompletionRow label="Specialties" done={profile.specialties?.length > 0} />
+          <CompletionRow label="Services" done={profile.service_types?.length > 0} />
+          <CompletionRow label="Experience" done={!!profile.work_history || profile.years_of_experience > 0} />
+          <CompletionRow label="ID Document" done={!!profile.id_document_url} />
+        </div>
+
         {profile.bio && (
           <Section title="About">
             <p className="text-[13px] text-muted-foreground leading-relaxed">{profile.bio}</p>
@@ -182,16 +189,13 @@ export default function VetterProfile() {
           </Section>
         )}
 
-        {profile.work_history && (
+        {(profile.work_history || profile.years_of_experience > 0) && (
           <Section title="Experience">
-            <div className="flex items-start gap-3">
-              <Briefcase className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-              <p className="text-[13px] text-muted-foreground leading-relaxed">{profile.work_history}</p>
-            </div>
+            {profile.work_history && (
+              <p className="text-[13px] text-muted-foreground leading-relaxed mb-2">{profile.work_history}</p>
+            )}
             {profile.years_of_experience > 0 && (
-              <p className="text-[12px] font-semibold text-foreground mt-2">
-                {profile.years_of_experience} years of experience
-              </p>
+              <p className="text-[12px] font-semibold text-foreground">{profile.years_of_experience} years of experience</p>
             )}
           </Section>
         )}
@@ -209,7 +213,7 @@ export default function VetterProfile() {
   );
 }
 
-function StatBox({ value, label, icon: Icon }) {
+function StatBox({ value, label }) {
   return (
     <div className="flex flex-col items-center py-2.5 bg-background rounded-xl border border-border/60">
       <span className="font-heading font-bold text-foreground text-[16px]">{value}</span>
@@ -223,6 +227,17 @@ function Section({ title, children }) {
     <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
       <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2.5">{title}</p>
       {children}
+    </div>
+  );
+}
+
+function CompletionRow({ label, done }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[13px] text-foreground">{label}</span>
+      <span className={cn("text-[12px] font-semibold", done ? "text-green-600" : "text-muted-foreground")}>
+        {done ? "✓ Done" : "Missing"}
+      </span>
     </div>
   );
 }
