@@ -19,6 +19,7 @@ import Jobs from '@/pages/vetter/Jobs';
 import Schedule from '@/pages/vetter/Schedule';
 import Earnings from '@/pages/vetter/Earnings';
 import VetterOnboarding from '@/pages/vetter/VetterOnboarding';
+import ApplicationReceived from '@/pages/vetter/ApplicationReceived';
 import VetterProfilePage from '@/pages/vetter/VetterProfile';
 import SubmitReport from '@/pages/vetter/SubmitReport';
 import ReportView from '@/pages/ReportView';
@@ -64,6 +65,7 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Landing />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
+      <Route path="/vetter/application-received" element={<ApplicationReceived />} />
       <Route element={<AppLayout />}>
         <Route path="/home" element={<Home />} />
         <Route path="/requests" element={<Requests />} />

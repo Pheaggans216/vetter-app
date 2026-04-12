@@ -61,18 +61,23 @@ export default function VetterOnboarding() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    await base44.entities.VetterProfile.create({
-      ...profile,
-      user_email: user.email,
-      years_of_experience: Number(profile.years_of_experience) || 0,
-      service_radius_miles: Number(profile.service_radius_miles) || 25,
-      status: "pending_review",
-      secure_exchange_approved: false,
-      certified_specialist: profile.service_types?.includes("specialist_vetting") ? true : undefined,
-    });
-    await base44.auth.updateMe({ role: "vetter", onboarded: true });
-    await refreshUser();
-    navigate("/jobs");
+    try {
+      await base44.entities.VetterProfile.create({
+        ...profile,
+        user_email: user.email,
+        years_of_experience: Number(profile.years_of_experience) || 0,
+        service_radius_miles: Number(profile.service_radius_miles) || 25,
+        status: "pending_review",
+        secure_exchange_approved: false,
+        certified_specialist: profile.service_types?.includes("specialist_vetting") ? true : undefined,
+      });
+      await base44.auth.updateMe({ role: "vetter", onboarded: true });
+      await refreshUser();
+      navigate("/vetter/application-received");
+    } catch (err) {
+      setSubmitting(false);
+      alert("Submission failed. Please try again.");
+    }
   };
 
   const stepProps = { profile, update };
