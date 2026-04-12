@@ -51,14 +51,20 @@ export default function EditProfile() {
   };
 
   const handleSave = async () => {
+    if (saving) return;
     setSaving(true);
     setError(null);
     setSuccess(false);
-    await base44.auth.updateMe(form);
-    await refreshUser();
-    setSaving(false);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3500);
+    try {
+      await base44.auth.updateMe(form);
+      await refreshUser();
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3500);
+    } catch (err) {
+      setError(err?.message || "Failed to save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
