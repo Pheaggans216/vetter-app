@@ -62,7 +62,9 @@ export default function Onboarding() {
     } catch (err) {
       clearTimeout(timeout);
       setSaving(false);
-      setError("Something went wrong. Please try again.");
+      const msg = err?.data?.message || err?.message || String(err);
+      console.error("[Onboarding] updateMe failed:", msg, err);
+      setError(`Something went wrong: ${msg}`);
     }
   };
 

@@ -5,12 +5,17 @@
     "role": {
       "type": "string",
       "enum": [
+        "admin",
+        "user",
         "buyer",
         "seller",
-        "vetter",
-        "admin"
+        "vetter"
       ],
       "default": "buyer"
+    },
+    "onboarded": {
+      "type": "boolean",
+      "default": false
     },
     "phone": {
       "type": "string"
@@ -29,11 +34,6 @@
     },
     "avatar_url": {
       "type": "string"
-    },
-    "onboarded": {
-      "type": "boolean",
-      "default": false
     }
-  },
-  "required": []
+  }
 }
