@@ -28,7 +28,7 @@ export default function BottomNav({ userRole }) {
       <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-1">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path || 
-            (tab.path !== "/home" && location.pathname.startsWith(tab.path));
+            (tab.path !== "/dashboard" && tab.path !== "/vetter/dashboard" && location.pathname.startsWith(tab.path));
           const Icon = tab.icon;
           
           return (

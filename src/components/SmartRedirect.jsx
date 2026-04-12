@@ -26,9 +26,10 @@ export default function SmartRedirect() {
     if (isLoading) return;
 
     const hasVetterProfile = vetterProfiles && vetterProfiles.length > 0;
-    const roleIsVetter = user?.role === "vetter" || user?.role === "admin";
 
-    if (hasVetterProfile || roleIsVetter) {
+    if (user?.role === "admin") {
+      navigate("/admin", { replace: true });
+    } else if (hasVetterProfile || user?.role === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
     } else {
       navigate("/dashboard", { replace: true });
