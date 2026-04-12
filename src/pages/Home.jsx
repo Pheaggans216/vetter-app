@@ -22,7 +22,7 @@ export default function Home() {
           />
           <div className="flex items-center gap-2">
             {user ? (
-              <Link to="/home">
+              <Link to="/dashboard">
                 <button className="h-8 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors">
                   Dashboard
                 </button>
