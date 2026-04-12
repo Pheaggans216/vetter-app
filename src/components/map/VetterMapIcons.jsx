@@ -1,45 +1,59 @@
 /**
- * Vetter Map Icons — Simple flat ram head pin markers
- * Minimal silhouette, high contrast, no gradients, Uber-style
+ * Vetter Map Icons — Uses the exact uploaded Vetter logo asset.
+ * No redrawing. Logo is embedded as an <image> inside an SVG pin.
  */
 
-// Simple ram silhouette: round head + two curved horns
-function ramSilhouette(fill) {
-  return `
-    <path d="M11 18 C7 18 4 15 5 11 C6 8 9 7 11 9 C12 7 14 6 16 6 C22 6 26 10 26 15 C26 20 22 24 16 24 C14 24 12 23 11 22 Z" fill="${fill}"/>
-    <path d="M11 9 C10 7 8 5 6 6 C4 7 3 10 5 12 C6 13 8 13 10 12 Z" fill="${fill}"/>
-    <path d="M21 9 C22 7 24 5 26 6 C28 7 29 10 27 12 C26 13 24 13 22 12 Z" fill="${fill}"/>
-  `;
-}
+const LOGO_URL =
+  "https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/efeafb0c3_Vetter_logo_with_ram_s_head_symbol.png";
 
-export function getAvailableIconSvg(size = 40) {
+function makePinSvg({ size = 44, badgeColor = null, badgeIcon = null }) {
   const w = size;
-  const h = Math.round(size * 1.3);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="${w}" height="${h}">
-    <path d="M16 2 C8 2 2 8 2 16 C2 24 16 40 16 40 C16 40 30 24 30 16 C30 8 24 2 16 2 Z" fill="#22c55e"/>
-    <g transform="translate(0, 2)">${ramSilhouette('#fff')}</g>
+  const pinH = Math.round(size * 1.35);
+  const logoSize = Math.round(size * 0.78);
+  const logoOffset = Math.round((size - logoSize) / 2);
+  const badgeR = Math.round(size * 0.16);
+  const badgeX = Math.round(size * 0.78);
+  const badgeY = Math.round(size * 0.18);
+
+  const badge = badgeColor
+    ? `<circle cx="${badgeX}" cy="${badgeY}" r="${badgeR + 2}" fill="white"/>
+       <circle cx="${badgeX}" cy="${badgeY}" r="${badgeR}" fill="${badgeColor}"/>
+       ${badgeIcon ? `<text x="${badgeX}" y="${badgeY + Math.round(badgeR * 0.45)}" text-anchor="middle" font-size="${Math.round(badgeR * 1.1)}" fill="white">${badgeIcon}</text>` : ""}`
+    : "";
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${w} ${pinH}" width="${w}" height="${pinH}">
+    <defs>
+      <clipPath id="circle-clip-${size}-${badgeColor || 'none'}">
+        <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2 - 2}"/>
+      </clipPath>
+    </defs>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}" fill="white" stroke="#e2e8f0" stroke-width="2"/>
+    <image
+      href="${LOGO_URL}"
+      x="${logoOffset}"
+      y="${logoOffset}"
+      width="${logoSize}"
+      height="${logoSize}"
+      clip-path="url(#circle-clip-${size}-${badgeColor || 'none'})"
+      preserveAspectRatio="xMidYMid meet"
+    />
+    <polygon points="${size / 2 - 5},${size - 2} ${size / 2 + 5},${size - 2} ${size / 2},${pinH - 2}" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+    ${badge}
   </svg>`;
 }
 
-export function getBusyIconSvg(size = 40) {
-  const w = size;
-  const h = Math.round(size * 1.3);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="${w}" height="${h}">
-    <path d="M16 2 C8 2 2 8 2 16 C2 24 16 40 16 40 C16 40 30 24 30 16 C30 8 24 2 16 2 Z" fill="#f59e0b"/>
-    <g transform="translate(0, 2)">${ramSilhouette('#fff')}</g>
-  </svg>`;
+export function getAvailableIconSvg(size = 44) {
+  return makePinSvg({ size, badgeColor: "#22c55e" });
 }
 
-export function getTopRatedIconSvg(size = 40) {
-  const w = size;
-  const h = Math.round(size * 1.3);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="${w}" height="${h}">
-    <path d="M16 2 C8 2 2 8 2 16 C2 24 16 40 16 40 C16 40 30 24 30 16 C30 8 24 2 16 2 Z" fill="#3b82f6"/>
-    <g transform="translate(0, 2)">${ramSilhouette('#fff')}</g>
-  </svg>`;
+export function getBusyIconSvg(size = 44) {
+  return makePinSvg({ size, badgeColor: "#f59e0b", badgeIcon: "⏸" });
 }
 
-// React wrappers (for use outside Leaflet)
+export function getTopRatedIconSvg(size = 44) {
+  return makePinSvg({ size, badgeColor: "#3b82f6", badgeIcon: "★" });
+}
+
 export function VetterAvailableIcon({ size = 40 }) {
   return <div dangerouslySetInnerHTML={{ __html: getAvailableIconSvg(size) }} />;
 }

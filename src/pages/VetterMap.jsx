@@ -21,22 +21,22 @@ import { geocodeLocation, cityFallback, distanceMiles, stableJitter } from "@/li
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl: "", shadowUrl: "" });
 
-// Build a Leaflet DivIcon using custom SVG ram icons
+// Build a Leaflet DivIcon using the exact uploaded logo
 function makePinIcon(vetter, selected) {
   const isTopRated = vetter.rating >= 4.8 || vetter.secure_exchange_approved;
   const isBusy = vetter.available === false;
+  const size = selected ? 52 : 42;
+  const pinH = Math.round(size * 1.35);
   const svgHtml = isTopRated
-    ? getTopRatedIconSvg(selected ? 52 : 44)
+    ? getTopRatedIconSvg(size)
     : isBusy
-    ? getBusyIconSvg(selected ? 52 : 44)
-    : getAvailableIconSvg(selected ? 52 : 44);
-  const size = selected ? 52 : 44;
-  const height = Math.round(size * 1.2);
+    ? getBusyIconSvg(size)
+    : getAvailableIconSvg(size);
   return L.divIcon({
-    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.6))' : 'none'}">${svgHtml}</div>`,
+    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.7))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))'}">${svgHtml}</div>`,
     className: "",
-    iconSize: [size, height],
-    iconAnchor: [size / 2, height],
+    iconSize: [size, pinH],
+    iconAnchor: [size / 2, pinH],
   });
 }
 
