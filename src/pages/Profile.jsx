@@ -39,7 +39,12 @@ export default function Profile() {
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
-    await base44.auth.logout();
+    // Delete vetter profile if exists, then sign out
+    try {
+      const profiles = await base44.entities.VetterProfile.filter({ user_email: user?.email });
+      for (const p of profiles) await base44.entities.VetterProfile.delete(p.id);
+    } catch (_) {}
+    base44.auth.logout();
   };
 
   return (

@@ -27,6 +27,12 @@ export default function SmartRedirect() {
 
     const hasVetterProfile = vetterProfiles && vetterProfiles.length > 0;
 
+    // New users who haven't completed onboarding
+    if (!user?.onboarded && user?.role !== "admin") {
+      navigate("/onboarding", { replace: true });
+      return;
+    }
+
     if (user?.role === "admin") {
       navigate("/admin", { replace: true });
     } else if (hasVetterProfile || user?.role === "vetter") {
