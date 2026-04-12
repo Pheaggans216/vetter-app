@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { useState } from "react";
 import SplashScreen from "@/components/SplashScreen";
+import { navLogoRef } from "@/lib/navLogoRef";
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -107,7 +108,7 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
+        {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} navLogoRef={navLogoRef} />}
         <Router>
           <AuthenticatedApp />
         </Router>
