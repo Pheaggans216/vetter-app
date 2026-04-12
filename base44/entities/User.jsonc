@@ -2,6 +2,19 @@
   "name": "User",
   "type": "object",
   "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "isAdmin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Grants admin access regardless of role field"
+    },
     "app_role": {
       "type": "string",
       "enum": [
@@ -9,12 +22,15 @@
         "seller",
         "vetter"
       ],
-      "default": "buyer",
-      "description": "App-level role chosen during onboarding"
+      "description": "The user's role within the Vetter marketplace"
     },
     "onboarded": {
       "type": "boolean",
       "default": false
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Optional profile photo URL"
     },
     "phone": {
       "type": "string"
@@ -29,9 +45,6 @@
       "type": "string"
     },
     "bio": {
-      "type": "string"
-    },
-    "avatar_url": {
       "type": "string"
     }
   }

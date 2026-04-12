@@ -21,7 +21,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const { user } = useAuth();
 
-  if (user?.role !== "admin") {
+  if (user?.role !== "admin" && !user?.isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">

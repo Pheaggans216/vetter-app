@@ -35,7 +35,7 @@ export default function SmartRedirect() {
 
     const appRole = user?.app_role;
 
-    if (user?.role === "admin") {
+    if (user?.role === "admin" || user?.isAdmin) {
       navigate("/admin", { replace: true });
     } else if (hasVetterProfile || appRole === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
