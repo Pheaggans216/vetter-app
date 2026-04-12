@@ -81,6 +81,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<RootRoute />} />
+      <Route path="/home" element={<RootRoute />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
       <Route path="/vetter/application-received" element={<ApplicationReceived />} />
@@ -90,7 +91,6 @@ const AuthenticatedApp = () => {
         <Route path="/dashboard/seller" element={<SellerDashboard />} />
         <Route path="/vetter/dashboard" element={<VetterDashboard />} />
         <Route path="/dashboard/vetter" element={<VetterDashboard />} />
-        <Route path="/home" element={<Home />} />
         <Route path="/requests" element={<Requests />} />
         <Route path="/requests/new" element={<NewRequest />} />
         <Route path="/requests/:id" element={<RequestDetail />} />
