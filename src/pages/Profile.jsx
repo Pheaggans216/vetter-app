@@ -20,7 +20,7 @@ const roleLabels = {
 };
 
 const menuItems = [
-  { icon: User, label: "Edit Profile", href: null, comingSoon: true },
+  { icon: User, label: "Edit Profile", href: "/profile/edit" },
   { icon: Gift, label: "Invite & Earn", href: "/referrals" },
   { icon: HelpCircle, label: "Help & Support", href: "/faq" },
   { icon: Bell, label: "Notifications", href: null, comingSoon: true },

@@ -38,6 +38,7 @@ import AdminFlagged from '@/pages/admin/AdminFlagged';
 import AdminMetrics from '@/pages/admin/AdminMetrics';
 import SiteMap from '@/pages/admin/SiteMap';
 import Referrals from '@/pages/Referrals';
+import EditProfile from '@/pages/EditProfile';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -84,6 +85,7 @@ const AuthenticatedApp = () => {
         <Route path="/requests/:id/report" element={<ReportView />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/referrals" element={<Referrals />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/map" element={<VetterMap />} />
       </Route>
       <Route element={<AdminLayout />}>
