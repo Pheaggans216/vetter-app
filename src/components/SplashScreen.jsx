@@ -11,7 +11,9 @@ export default function SplashScreen({ onDone, navLogoRef }) {
   useEffect(() => {
     // After 2.5s of splash, start the fly animation
     const t1 = setTimeout(() => setPhase("fly"), 2500);
-    return () => clearTimeout(t1);
+    // Hard safety fallback: always finish by 4s so UI is never blocked
+    const t2 = setTimeout(() => { setPhase("done"); onDone(); }, 4000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   // Once fly animation is done, remove overlay and notify parent
@@ -51,7 +53,7 @@ export default function SplashScreen({ onDone, navLogoRef }) {
             background: isFly
               ? "transparent"
               : "linear-gradient(160deg, #0d1b2a 0%, #112240 60%, #0a1628 100%)",
-            pointerEvents: isFly ? "none" : "all",
+            pointerEvents: isFly ? "none" : isDone ? "none" : "all",
             transition: "background 0.5s ease",
           }}
         >
