@@ -61,7 +61,13 @@ export default function EditProfile() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3500);
     } catch (err) {
-      setError(err?.message || "Failed to save. Please try again.");
+      const msg = err?.message || err?.data?.message || String(err);
+      if (msg?.toLowerCase().includes('auth') || err?.status === 401 || err?.status === 403) {
+        // Session expired — redirect to login and come back
+        base44.auth.redirectToLogin(window.location.href);
+        return;
+      }
+      setError(msg || "Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }
