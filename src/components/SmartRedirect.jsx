@@ -1,50 +1,41 @@
 /**
  * SmartRedirect — shown at "/" for logged-in users.
- * Detects role and redirects to the correct dashboard.
+ * NEW users (onboarded=false or no app_role) always go to /onboarding.
  */
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
 export default function SmartRedirect() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const { data: vetterProfiles, isLoading } = useQuery({
-    queryKey: ["smart-redirect-vetter", user?.email],
-    queryFn: () => base44.entities.VetterProfile.filter({ user_email: user?.email }),
-    enabled: !!user?.email,
-  });
-
   useEffect(() => {
-    if (!isAuthenticated) {
-      // Not logged in — show landing (handled by parent, nothing to do)
+    if (!isAuthenticated || !user) return;
+
+    const isAdmin = user.role === "admin" || user.isAdmin;
+
+    // Admins skip onboarding
+    if (isAdmin) {
+      navigate("/admin", { replace: true });
       return;
     }
-    if (isLoading) return;
 
-    const hasVetterProfile = vetterProfiles && vetterProfiles.length > 0;
-
-    // New users who haven't completed onboarding
-    if (!user?.onboarded && user?.role !== "admin") {
+    // Force onboarding if not complete OR no role assigned
+    if (!user.onboarded || !user.app_role) {
       navigate("/onboarding", { replace: true });
       return;
     }
 
-    const appRole = user?.app_role;
-
-    if (user?.role === "admin" || user?.isAdmin) {
-      navigate("/admin", { replace: true });
-    } else if (hasVetterProfile || appRole === "vetter") {
+    // Route by role
+    if (user.app_role === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
-    } else if (appRole === "seller") {
+    } else if (user.app_role === "seller") {
       navigate("/dashboard/seller", { replace: true });
     } else {
       navigate("/dashboard/buyer", { replace: true });
     }
-  }, [isAuthenticated, isLoading, vetterProfiles, user]);
+  }, [isAuthenticated, user]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">

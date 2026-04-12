@@ -37,6 +37,7 @@ import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminFlagged from '@/pages/admin/AdminFlagged';
 import AdminMetrics from '@/pages/admin/AdminMetrics';
 import SiteMap from '@/pages/admin/SiteMap';
+import AdminUsers from '@/pages/admin/AdminUsers';
 import Referrals from '@/pages/Referrals';
 import EditProfile from '@/pages/EditProfile';
 import BuyerDashboard from '@/pages/BuyerDashboard';
@@ -116,6 +117,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/flagged" element={<AdminFlagged />} />
         <Route path="/admin/metrics" element={<AdminMetrics />} />
         <Route path="/admin/sitemap" element={<SiteMap />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

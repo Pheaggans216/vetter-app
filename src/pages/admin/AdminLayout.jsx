@@ -2,12 +2,13 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import {
   LayoutDashboard, Users, ClipboardList, ShieldAlert,
-  CreditCard, BarChart2, Shield, LogOut, ChevronRight, Map
+  CreditCard, BarChart2, Shield, Map, UserCog
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Overview", icon: LayoutDashboard, path: "/admin" },
+  { label: "Users", icon: UserCog, path: "/admin/users" },
   { label: "Vetter Applications", icon: Users, path: "/admin/vetters" },
   { label: "Job Requests", icon: ClipboardList, path: "/admin/requests" },
   { label: "Disputes", icon: ShieldAlert, path: "/admin/disputes" },
