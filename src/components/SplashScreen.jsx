@@ -9,8 +9,8 @@ export default function SplashScreen({ onDone, navLogoRef }) {
   const [phase, setPhase] = useState("splash"); // splash | fly | done
 
   useEffect(() => {
-    // After 1.6s of splash, start the fly animation
-    const t1 = setTimeout(() => setPhase("fly"), 1600);
+    // After 2.5s of splash, start the fly animation
+    const t1 = setTimeout(() => setPhase("fly"), 2500);
     return () => clearTimeout(t1);
   }, []);
 
@@ -69,11 +69,11 @@ export default function SplashScreen({ onDone, navLogoRef }) {
                 src={LOGO_URL}
                 alt="Vetter"
                 style={{
-                  width: "min(52vw, 52vh)",
+                  width: "min(45vw, 45vh)",
                   height: "auto",
                   filter:
-                    "brightness(0) invert(1) drop-shadow(0 0 28px rgba(100,160,255,0.4))",
-                  animation: "vetter-glow 2s ease-in-out infinite",
+                    "brightness(0) invert(1) drop-shadow(0 0 32px rgba(100,160,255,0.5))",
+                  animation: "vetter-spin 3s linear infinite",
                 }}
               />
             </motion.div>
@@ -116,9 +116,10 @@ export default function SplashScreen({ onDone, navLogoRef }) {
       )}
 
       <style>{`
-        @keyframes vetter-glow {
-          0%, 100% { filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(100,160,255,0.3)); }
-          50% { filter: brightness(0) invert(1) drop-shadow(0 0 44px rgba(100,190,255,0.6)); }
+        @keyframes vetter-spin {
+          0%   { filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(100,160,255,0.4)); transform: rotate(0deg); }
+          50%  { filter: brightness(0) invert(1) drop-shadow(0 0 44px rgba(100,190,255,0.7)); transform: rotate(180deg); }
+          100% { filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(100,160,255,0.4)); transform: rotate(360deg); }
         }
       `}</style>
     </AnimatePresence>

@@ -23,8 +23,12 @@ export default function LandingNav() {
           </Link>
           <button
             onClick={() => base44.auth.redirectToLogin()}
+            className="h-8 px-4 rounded-lg border border-border text-foreground text-[13px] font-semibold hover:bg-muted transition-colors">
+            Login
+          </button>
+          <button
+            onClick={() => base44.auth.redirectToLogin()}
             className="h-8 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors">
-            
             Sign Up
           </button>
         </div>
