@@ -14,6 +14,7 @@ const vetterTabs = [
   { label: "Jobs", icon: Briefcase, path: "/jobs" },
   { label: "Schedule", icon: Calendar, path: "/schedule" },
   { label: "Earnings", icon: DollarSign, path: "/earnings" },
+  { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/vetter/profile" },
 ];
 

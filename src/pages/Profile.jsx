@@ -20,12 +20,11 @@ const roleLabels = {
 };
 
 const menuItems = [
-  { icon: User, label: "Edit Profile", href: "#" },
-  { icon: Bell, label: "Notifications", href: "#" },
   { icon: Gift, label: "Invite & Earn", href: "/referrals" },
-  { icon: Settings, label: "Settings", href: "#" },
-  { icon: FileText, label: "Terms of Service", href: "#" },
-  { icon: HelpCircle, label: "Help & Support", href: "#" },
+  { icon: Bell, label: "Notifications", href: null, comingSoon: true },
+  { icon: Settings, label: "Settings", href: null, comingSoon: true },
+  { icon: FileText, label: "Terms of Service", href: null, comingSoon: true },
+  { icon: HelpCircle, label: "Help & Support", href: null, comingSoon: true },
 ];
 
 export default function Profile() {
@@ -71,10 +70,19 @@ export default function Profile() {
         </div>
       </div>
 
+      {/* Vetter profile shortcut */}
+      {(role === "vetter") && (
+        <Link to="/vetter/profile" className="flex items-center gap-3 px-4 py-3.5 bg-card rounded-2xl border border-border/60 shadow-sm mb-5 hover:bg-muted/50 transition-colors">
+          <User className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-[14px] font-medium text-foreground">My Vetter Profile</span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </Link>
+      )}
+
       {/* Menu Items */}
       <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden mb-5">
         {menuItems.map((item, i) => (
-          item.href && item.href !== "#" ? (
+          item.href ? (
             <Link
               key={item.label}
               to={item.href}
@@ -88,17 +96,17 @@ export default function Profile() {
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Link>
           ) : (
-            <button
+            <div
               key={item.label}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-left",
+                "w-full flex items-center gap-3 px-4 py-3.5",
                 i !== menuItems.length - 1 && "border-b border-border/40"
               )}
             >
-              <item.icon className="w-5 h-5 text-muted-foreground" />
-              <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </button>
+              <item.icon className="w-5 h-5 text-muted-foreground/50" />
+              <span className="flex-1 text-[14px] font-medium text-muted-foreground">{item.label}</span>
+              <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Soon</span>
+            </div>
           )
         ))}
       </div>

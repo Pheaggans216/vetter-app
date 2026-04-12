@@ -20,6 +20,8 @@ export default function NewRequest() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
+  const urlParams = new URLSearchParams(window.location.search);
+  const prefilledCategory = urlParams.get("category") || "other";
   const [form, setForm] = useState({
     title: "",
     listing_url: "",
@@ -29,7 +31,7 @@ export default function NewRequest() {
     location_state: "",
     location_zip: "",
     listing_platform: "other",
-    category: "other",
+    category: prefilledCategory,
   });
 
   const updateForm = (fields) => setForm((prev) => ({ ...prev, ...fields }));
