@@ -79,7 +79,7 @@ export default function VetterOnboarding() {
         secure_exchange_approved: false,
         certified_specialist: profile.service_types?.includes("specialist_vetting") || false,
       });
-      await base44.auth.updateMe({ role: "vetter", onboarded: true });
+      await base44.auth.updateMe({ app_role: "vetter", onboarded: true });
       await refreshUser();
       navigate("/vetter/application-received");
     } catch (err) {
