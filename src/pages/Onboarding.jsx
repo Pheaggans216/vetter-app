@@ -48,7 +48,7 @@ export default function Onboarding() {
     }, 8000);
 
     try {
-      await base44.functions.invoke('setUserRole', { role: selectedRole });
+      await base44.auth.updateMe({ app_role: selectedRole, onboarded: true });
       await refreshUser();
       clearTimeout(timeout);
       setSaving(false);

@@ -2,16 +2,15 @@
   "name": "User",
   "type": "object",
   "properties": {
-    "role": {
+    "app_role": {
       "type": "string",
       "enum": [
-        "admin",
-        "user",
         "buyer",
         "seller",
         "vetter"
       ],
-      "default": "buyer"
+      "default": "buyer",
+      "description": "App-level role chosen during onboarding"
     },
     "onboarded": {
       "type": "boolean",

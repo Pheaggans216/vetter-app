@@ -7,7 +7,7 @@ const FULL_SCREEN_PAGES = ["/map"];
 
 export default function AppLayout() {
   const { user } = useAuth();
-  const userRole = user?.role || "buyer";
+  const userRole = user?.app_role || "buyer";
   const location = useLocation();
   const isFullScreen = FULL_SCREEN_PAGES.includes(location.pathname);
 

@@ -30,7 +30,7 @@ const menuItems = [
 
 export default function Profile() {
   const { user } = useAuth();
-  const role = user?.role || "buyer";
+  const role = user?.app_role || "buyer";
   const [deleting, setDeleting] = useState(false);
 
   const handleLogout = () => {

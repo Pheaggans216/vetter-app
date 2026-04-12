@@ -33,14 +33,16 @@ export default function SmartRedirect() {
       return;
     }
 
+    const appRole = user?.app_role;
+
     if (user?.role === "admin") {
       navigate("/admin", { replace: true });
-    } else if (hasVetterProfile || user?.role === "vetter") {
+    } else if (hasVetterProfile || appRole === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
-    } else if (user?.role === "seller") {
+    } else if (appRole === "seller") {
       navigate("/dashboard/seller", { replace: true });
     } else {
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard/buyer", { replace: true });
     }
   }, [isAuthenticated, isLoading, vetterProfiles, user]);
 
