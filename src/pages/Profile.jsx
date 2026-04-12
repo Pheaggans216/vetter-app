@@ -20,11 +20,12 @@ const roleLabels = {
 };
 
 const menuItems = [
+  { icon: User, label: "Edit Profile", href: null, comingSoon: true },
   { icon: Gift, label: "Invite & Earn", href: "/referrals" },
+  { icon: HelpCircle, label: "Help & Support", href: "/faq" },
   { icon: Bell, label: "Notifications", href: null, comingSoon: true },
   { icon: Settings, label: "Settings", href: null, comingSoon: true },
   { icon: FileText, label: "Terms of Service", href: null, comingSoon: true },
-  { icon: HelpCircle, label: "Help & Support", href: null, comingSoon: true },
 ];
 
 export default function Profile() {
