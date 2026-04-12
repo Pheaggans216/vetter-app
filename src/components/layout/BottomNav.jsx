@@ -28,7 +28,7 @@ const vetterTabs = [
 
 export default function BottomNav({ userRole }) {
   const location = useLocation();
-  const tabs = (userRole === "vetter" || userRole === "admin")
+  const tabs = userRole === "vetter"
     ? vetterTabs
     : userRole === "seller"
     ? sellerTabs

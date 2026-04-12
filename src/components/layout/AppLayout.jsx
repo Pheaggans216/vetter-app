@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import BottomNav from "./BottomNav";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,8 +7,16 @@ const FULL_SCREEN_PAGES = ["/map"];
 
 export default function AppLayout() {
   const { user } = useAuth();
-  const userRole = user?.app_role || "buyer";
   const location = useLocation();
+
+  const isAdmin = user?.role === "admin" || user?.isAdmin;
+
+  // Guard: if not onboarded or no role, send to onboarding
+  if (user && !isAdmin && (!user.onboarded || !user.app_role)) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  const userRole = user?.app_role || "buyer";
   const isFullScreen = FULL_SCREEN_PAGES.includes(location.pathname);
 
   if (isFullScreen) {
