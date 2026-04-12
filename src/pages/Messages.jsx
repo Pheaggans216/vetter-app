@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { MessageCircle } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 export default function Messages() {
   const { user } = useAuth();
@@ -42,9 +43,10 @@ export default function Messages() {
           {myConversations.map((convo) => {
             const otherParticipant = convo.participants?.find((p) => p !== user?.email) || "Unknown";
             return (
-              <div
+              <Link
                 key={convo.id}
-                className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm flex items-center gap-3"
+                to={`/messages/${convo.id}`}
+                className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm flex items-center gap-3 hover:bg-muted/30 transition-colors block"
               >
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <span className="text-primary font-semibold text-sm">
@@ -59,12 +61,19 @@ export default function Messages() {
                     {convo.last_message || "No messages yet"}
                   </p>
                 </div>
-                {convo.last_message_at && (
-                  <span className="text-[11px] text-muted-foreground shrink-0">
-                    {format(new Date(convo.last_message_at), "MMM d")}
-                  </span>
-                )}
-              </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  {convo.last_message_at && (
+                    <span className="text-[11px] text-muted-foreground">
+                      {format(new Date(convo.last_message_at), "MMM d")}
+                    </span>
+                  )}
+                  {convo.unread_count > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-primary-foreground">{convo.unread_count}</span>
+                    </span>
+                  )}
+                </div>
+              </Link>
             );
           })}
         </div>

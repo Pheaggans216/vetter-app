@@ -42,6 +42,7 @@ import EditProfile from '@/pages/EditProfile';
 import BuyerDashboard from '@/pages/BuyerDashboard';
 import VetterDashboard from '@/pages/vetter/VetterDashboard';
 import SmartRedirect from '@/components/SmartRedirect';
+import Chat from '@/pages/Chat';
 
 // Decides what to show at "/" — landing for guests, smart redirect for members
 function RootRoute() {
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
         <Route path="/requests/new" element={<NewRequest />} />
         <Route path="/requests/:id" element={<RequestDetail />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/messages/:conversationId" element={<Chat />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/schedule" element={<Schedule />} />

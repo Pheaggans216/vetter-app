@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
-  UserCheck, Calendar, DollarSign, ShieldCheck
+  UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -43,6 +43,22 @@ export default function RequestDetail() {
   const id = window.location.pathname.split("/").pop();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const messageMutation = useMutation({
+    mutationFn: async ({ buyerEmail, vetterEmail, requestId }) => {
+      // Find or create conversation
+      const existing = await base44.entities.Conversation.filter({ request_id: requestId });
+      const convo = existing.find(c => c.participants?.includes(buyerEmail) && c.participants?.includes(vetterEmail));
+      if (convo) return convo;
+      return base44.entities.Conversation.create({
+        request_id: requestId,
+        participants: [buyerEmail, vetterEmail],
+        unread_count: 0,
+      });
+    },
+    onSuccess: (convo) => navigate(`/messages/${convo.id}`),
+  });
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["vetting-request", id],
@@ -155,7 +171,7 @@ export default function RequestDetail() {
           </div>
         </div>
 
-        {/* Assigned Vetter */}
+        {/* Assigned Vetter + Message */}
         {assignedVetter && request.status !== "pending" && (
           <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
             <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2.5">Your Vetter</p>
@@ -167,13 +183,23 @@ export default function RequestDetail() {
                   <span className="text-primary font-bold">{assignedVetter.display_name?.[0]}</span>
                 )}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-foreground text-[14px]">{assignedVetter.display_name}</p>
                 <p className="text-muted-foreground text-[12px]">
                   {[assignedVetter.city, assignedVetter.state].filter(Boolean).join(", ")}
                   {assignedVetter.rating && ` · ⭐ ${assignedVetter.rating.toFixed(1)}`}
                 </p>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl gap-1.5 text-[12px] shrink-0"
+                disabled={messageMutation.isPending}
+                onClick={() => messageMutation.mutate({ buyerEmail: request.buyer_email, vetterEmail: request.vetter_email, requestId: request.id })}
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                Message
+              </Button>
             </div>
           </div>
         )}
