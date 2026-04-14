@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Tag, Wrench, Shield, ChevronDown, Check } from "lucide-react";
 
@@ -11,8 +12,16 @@ const MODE_CONFIG = {
   pro_security: { label: "Pro Security", icon: Shield, color: "text-purple-600", bg: "bg-purple-50" },
 };
 
+const MODE_ROUTES = {
+  buyer: "/dashboard/buyer",
+  seller: "/dashboard/seller",
+  vetter: "/vetter/dashboard",
+  pro_security: "/dashboard/buyer", // fallback until pro_security dashboard exists
+};
+
 export default function ModeSwitcher({ compact = false }) {
   const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
 
@@ -37,8 +46,7 @@ export default function ModeSwitcher({ compact = false }) {
     await base44.auth.updateMe({ active_mode: mode, app_role: mode });
     await refreshUser();
     setSwitching(false);
-    // Reload to ensure correct dashboard loads
-    window.location.reload();
+    navigate(MODE_ROUTES[mode] || "/dashboard/buyer");
   };
 
   if (compact) {

@@ -11,7 +11,6 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 import Landing from '@/pages/Landing';
 import AppLayout from '@/components/layout/AppLayout';
-import Home from '@/pages/Home';
 import Requests from '@/pages/Requests';
 import NewRequest from '@/pages/NewRequest';
 import RequestDetail from '@/pages/RequestDetail';
@@ -82,7 +81,6 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<RootRoute />} />
-      <Route path="/home" element={<RootRoute />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
       <Route path="/vetter/application-received" element={<ApplicationReceived />} />

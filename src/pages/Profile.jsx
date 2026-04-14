@@ -39,15 +39,17 @@ export default function Profile() {
   const enabledRoles = user?.app_roles?.length ? user.app_roles : user?.app_role ? [user.app_role] : ["buyer"];
   const isAdmin = user?.role === "admin";
   const currentMode = user?.active_mode || user?.app_role || "buyer";
-  const currentCfg = ROLE_CONFIG[currentMode] || ROLE_CONFIG.buyer;
-  const CurrentIcon = currentCfg.icon;
-
   const unlockedRoles = ALL_ROLES.filter((r) => !enabledRoles.includes(r));
 
   const handleAddRole = async (roleValue) => {
     setAddingRole(roleValue);
     const newRoles = [...enabledRoles, roleValue];
-    await base44.auth.updateMe({ app_roles: newRoles, app_role: user.app_role || roleValue });
+    // Also update active_mode to the new role so the user lands on its dashboard
+    await base44.auth.updateMe({
+      app_roles: newRoles,
+      app_role: user.app_role || roleValue,
+      active_mode: roleValue,
+    });
     await refreshUser();
     setAddingRole(null);
     if (roleValue === "vetter") {
