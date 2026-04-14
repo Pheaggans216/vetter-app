@@ -45,6 +45,7 @@ import VetterDashboard from '@/pages/vetter/VetterDashboard';
 import SmartRedirect from '@/components/SmartRedirect';
 import SellerDashboard from '@/pages/SellerDashboard';
 import Chat from '@/pages/Chat';
+import PublicVetterProfile from '@/pages/PublicVetterProfile';
 
 // Decides what to show at "/" — landing for guests, smart redirect for members
 function RootRoute() {
@@ -107,6 +108,7 @@ const AuthenticatedApp = () => {
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/map" element={<VetterMap />} />
+        <Route path="/vetters/:id" element={<PublicVetterProfile />} />
       </Route>
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<AdminOverview />} />

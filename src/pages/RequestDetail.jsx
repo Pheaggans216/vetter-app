@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
-  UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle
+  UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle, User
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -190,16 +190,24 @@ export default function RequestDetail() {
                   {assignedVetter.rating && ` · ⭐ ${assignedVetter.rating.toFixed(1)}`}
                 </p>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="rounded-xl gap-1.5 text-[12px] shrink-0"
-                disabled={messageMutation.isPending}
-                onClick={() => messageMutation.mutate({ buyerEmail: request.buyer_email, vetterEmail: request.vetter_email, requestId: request.id })}
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                Message
-              </Button>
+              <div className="flex flex-col gap-1.5 shrink-0">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl gap-1.5 text-[12px]"
+                  disabled={messageMutation.isPending}
+                  onClick={() => messageMutation.mutate({ buyerEmail: request.buyer_email, vetterEmail: request.vetter_email, requestId: request.id })}
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Message
+                </Button>
+                <Link to={`/vetters/${assignedVetter.id}`}>
+                  <Button size="sm" variant="ghost" className="rounded-xl gap-1.5 text-[12px] w-full">
+                    <User className="w-3.5 h-3.5" />
+                    View Profile
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
-import { Star, MapPin, ShieldCheck, Award, Zap, Clock } from "lucide-react";
+import { Star, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const SERVICE_PRICES = {
@@ -89,6 +90,11 @@ export default function VetterListCard({ vetter, distanceMi, onSelect, onViewOnM
               Map
             </Button>
           )}
+          <Link to={`/vetters/${vetter.id}`}>
+            <Button size="sm" variant="outline" className="h-8 rounded-xl text-[12px] px-3">
+              Profile
+            </Button>
+          </Link>
           <Button size="sm" onClick={() => onSelect(vetter)} variant={selected ? "secondary" : "default"}
             className="h-8 rounded-xl text-[12px] font-semibold px-3">
             {selected ? "Selected ✓" : "Select"}
