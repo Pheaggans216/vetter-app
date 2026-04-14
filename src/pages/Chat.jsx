@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { ArrowLeft, Send, Paperclip, X, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, X, FileImage } from "lucide-react";
 import ChatBubble from "@/components/chat/ChatBubble";
 import RequestContextBanner from "@/components/chat/RequestContextBanner";
 
@@ -194,7 +194,7 @@ export default function Chat() {
             <img src={attachedFile.url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
           ) : (
             <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center shrink-0">
-              <ImageIcon className="w-4 h-4 text-muted-foreground" />
+              <FileImage className="w-4 h-4 text-muted-foreground" />
             </div>
           )}
           <span className="text-[12px] text-foreground truncate flex-1">{attachedFile.name || "Attachment"}</span>

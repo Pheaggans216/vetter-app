@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle2, UserCheck, Loader2, XCircle, Calendar, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -37,9 +36,7 @@ export default function RequestCard({ request }) {
   const showMessage = CAN_MESSAGE.includes(request.status) && request.vetter_email;
 
   const messageMutation = useMutation({
-    mutationFn: async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    mutationFn: async () => {
       const existing = await base44.entities.Conversation.filter({ request_id: request.id });
       const convo = existing.find(
         (c) => c.participants?.includes(request.buyer_email) && c.participants?.includes(request.vetter_email)
@@ -83,7 +80,7 @@ export default function RequestCard({ request }) {
             )}
             {showMessage && (
               <button
-                onClick={(e) => messageMutation.mutate(e)}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); messageMutation.mutate(); }}
                 disabled={messageMutation.isPending}
                 className="flex items-center gap-1 text-[12px] text-primary font-medium px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/15 transition-colors"
               >

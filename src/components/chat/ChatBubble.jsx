@@ -2,10 +2,6 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ExternalLink, FileText } from "lucide-react";
 
-function isImageUrl(url) {
-  return /\.(jpe?g|png|gif|webp|heic)$/i.test(url) || url.includes("image");
-}
-
 function isFileLink(content) {
   return content?.includes("📎") && content?.includes("http");
 }

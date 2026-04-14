@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export default function Messages() {
   const { user } = useAuth();
@@ -149,8 +150,4 @@ export default function Messages() {
       )}
     </div>
   );
-}
-
-function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
 }
