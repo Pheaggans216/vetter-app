@@ -32,6 +32,7 @@ export default function NewRequest() {
     location_zip: "",
     listing_platform: "other",
     category: prefilledCategory,
+    uploaded_screenshots: [],
   });
 
   const updateForm = (fields) => setForm((prev) => ({ ...prev, ...fields }));

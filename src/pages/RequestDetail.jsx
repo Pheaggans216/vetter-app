@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
-  UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle, User
+  UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle, User,
+  Paperclip, FileText, ImageIcon, Video
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -228,6 +229,38 @@ export default function RequestDetail() {
               <ExternalLink className="w-4 h-4 text-primary" />
             </div>
           </a>
+        )}
+
+        {/* Attachments */}
+        {request.uploaded_screenshots?.length > 0 && (
+          <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
+            <p className="text-[13px] font-semibold text-foreground mb-3 flex items-center gap-1.5">
+              <Paperclip className="w-4 h-4 text-muted-foreground" />
+              Attachments ({request.uploaded_screenshots.length})
+            </p>
+            <div className="space-y-2">
+              {request.uploaded_screenshots.map((url, i) => {
+                const isImage = /\.(jpe?g|png|gif|webp|heic)$/i.test(url) || url.includes("image");
+                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
+                const Icon = isVideo ? Video : isImage ? ImageIcon : FileText;
+                const label = decodeURIComponent(url.split("/").pop().split("?")[0]) || `File ${i + 1}`;
+                return (
+                  <a key={url} href={url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 p-2.5 bg-muted/40 rounded-xl border border-border/50 hover:border-primary/30 transition-colors">
+                    {isImage ? (
+                      <img src={url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-border/40" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-card border border-border/60 flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="text-[12px] text-foreground truncate flex-1">{label}</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {/* Notes */}

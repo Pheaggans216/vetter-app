@@ -6,7 +6,7 @@ import PullToRefresh from "@/components/ui/PullToRefresh";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check, FileText } from "lucide-react";
+import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check, FileText, Paperclip } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -62,6 +62,28 @@ function JobCard({ job, onAccept, onDecline, actionPending, showActions }) {
 
       {job.description && (
         <p className="text-[12px] text-muted-foreground mb-3 line-clamp-2">{job.description}</p>
+      )}
+
+      {job.uploaded_screenshots?.length > 0 && (
+        <div className="flex items-center gap-1.5 mb-3">
+          <Paperclip className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <div className="flex gap-1.5 overflow-x-auto">
+            {job.uploaded_screenshots.map((url, i) => {
+              const isImage = /\.(jpe?g|png|gif|webp|heic)$/i.test(url) || url.includes("image");
+              return isImage ? (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                  <img src={url} alt="" className="w-9 h-9 rounded-lg object-cover border border-border/60 shrink-0" />
+                </a>
+              ) : (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-muted border border-border/60 flex items-center justify-center shrink-0">
+                  <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                </a>
+              );
+            })}
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-1">{job.uploaded_screenshots.length} file{job.uploaded_screenshots.length > 1 ? "s" : ""}</span>
+        </div>
       )}
 
       {showActions && (

@@ -1,4 +1,5 @@
 import { Link2, ArrowRight } from "lucide-react";
+import AttachmentsUploader from "./AttachmentsUploader";
 
 export default function StepItemDetails({ form, updateForm, onNext }) {
   const canProceed = form.title.trim().length > 0;
@@ -77,6 +78,12 @@ export default function StepItemDetails({ form, updateForm, onNext }) {
             className="w-full px-4 py-3 rounded-xl border border-border bg-card text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 transition resize-none"
           />
         </div>
+
+        {/* Attachments */}
+        <AttachmentsUploader
+          value={form.uploaded_screenshots || []}
+          onChange={(urls) => updateForm({ uploaded_screenshots: urls })}
+        />
       </div>
 
       <div className="mt-8">
