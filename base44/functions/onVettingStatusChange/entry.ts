@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       recipient_email: data.buyer_email,
       type: "status_change",
       title: label,
-      body: `Your request "${data.title}" is now: ${label}`,
+      body: `Your request "${data.title}" status changed to: ${label}`,
       link: `/requests/${data.id}`,
       request_id: data.id,
       read: false,

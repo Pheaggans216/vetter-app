@@ -23,18 +23,18 @@ Deno.serve(async (req) => {
     // Notify all participants except the sender
     const recipients = convo.participants.filter((p) => p !== data.sender_email);
 
+    // Resolve sender display name once (outside the loop)
+    let senderName = data.sender_email.split("@")[0];
+    const vetterProfiles = await base44.asServiceRole.entities.VetterProfile.filter({ user_email: data.sender_email });
+    if (vetterProfiles[0]?.display_name) {
+      senderName = vetterProfiles[0].display_name;
+    }
+
+    const preview = data.message_type === "image"
+      ? "📷 Sent an image"
+      : data.content.slice(0, 80);
+
     for (const email of recipients) {
-      // Try to get vetter display name for a friendlier notification body
-      let senderName = data.sender_email.split("@")[0];
-      const vetterProfiles = await base44.asServiceRole.entities.VetterProfile.filter({ user_email: data.sender_email });
-      if (vetterProfiles[0]?.display_name) {
-        senderName = vetterProfiles[0].display_name;
-      }
-
-      const preview = data.message_type === "image"
-        ? "📷 Sent an image"
-        : data.content.slice(0, 80);
-
       await base44.asServiceRole.entities.Notification.create({
         recipient_email: email,
         type: "new_message",
@@ -47,6 +47,7 @@ Deno.serve(async (req) => {
     }
 
     return Response.json({ success: true, notified: recipients.length });
+
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
