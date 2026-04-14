@@ -117,7 +117,19 @@ export default function NotificationBell() {
                 >
                   <div className="flex items-start gap-2.5">
                     <span className="text-[16px] mt-0.5 shrink-0">
-                      {n.type === "new_message" ? "💬" : "🔔"}
+                      {n.type === "new_message"
+                        ? "💬"
+                        : n.title?.includes("Matched") || n.title?.includes("matched")
+                        ? "🎉"
+                        : n.title?.includes("Tomorrow") || n.title?.includes("Scheduled")
+                        ? "📅"
+                        : n.title?.includes("Complete") || n.title?.includes("complete")
+                        ? "✅"
+                        : n.title?.includes("Cancelled") || n.title?.includes("cancelled")
+                        ? "❌"
+                        : n.title?.includes("Progress") || n.title?.includes("progress")
+                        ? "🔍"
+                        : "🔔"}
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className={cn("text-[13px] text-foreground leading-snug", !n.read && "font-semibold")}>

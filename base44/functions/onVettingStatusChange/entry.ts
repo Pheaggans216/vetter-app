@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
 
     const label = statusLabels[newStatus] || newStatus;
 
+    // Notify the buyer
     await base44.asServiceRole.entities.Notification.create({
       recipient_email: data.buyer_email,
       type: "status_change",
@@ -37,6 +38,32 @@ Deno.serve(async (req) => {
       request_id: data.id,
       read: false,
     });
+
+    // Notify vetter when a job is assigned to them
+    if (data.vetter_email && newStatus === "matched") {
+      await base44.asServiceRole.entities.Notification.create({
+        recipient_email: data.vetter_email,
+        type: "status_change",
+        title: "New Job Request 🎯",
+        body: `You've been matched to inspect: "${data.title}". Accept or decline in your Jobs tab.`,
+        link: `/jobs`,
+        request_id: data.id,
+        read: false,
+      });
+    }
+
+    // Notify vetter when a scheduled job is confirmed
+    if (data.vetter_email && newStatus === "scheduled" && oldStatus === "matched") {
+      await base44.asServiceRole.entities.Notification.create({
+        recipient_email: data.vetter_email,
+        type: "status_change",
+        title: "Job Scheduled 📅",
+        body: `Your inspection for "${data.title}" is now scheduled.`,
+        link: `/jobs`,
+        request_id: data.id,
+        read: false,
+      });
+    }
 
     return Response.json({ success: true });
   } catch (error) {
