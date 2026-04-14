@@ -12,11 +12,13 @@ export default function AppLayout() {
   const isAdmin = user?.role === "admin" || user?.isAdmin;
 
   // Guard: if not onboarded or no role, send to onboarding
-  if (user && !isAdmin && (!user.onboarded || !user.app_role)) {
+  const hasRole = user?.app_roles?.length > 0 || user?.app_role;
+  if (user && !isAdmin && (!user.onboarded || !hasRole)) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  const userRole = user?.app_role || "buyer";
+  // Use active_mode if set, fall back to legacy app_role
+  const userRole = user?.active_mode || user?.app_role || "buyer";
   const isFullScreen = FULL_SCREEN_PAGES.includes(location.pathname);
 
   if (isFullScreen) {

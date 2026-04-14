@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import ModeSwitcher from "@/components/ModeSwitcher";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Link } from "react-router-dom";
@@ -45,6 +46,7 @@ export default function BuyerDashboard() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
+          <ModeSwitcher compact />
           <NotificationBell />
           <Link to="/profile">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-border/60">

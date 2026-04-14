@@ -8,16 +8,19 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift } from "lucide-react";
+import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift, ShoppingBag, Tag, Wrench, Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ModeSwitcher from "@/components/ModeSwitcher";
 
-const roleLabels = {
-  buyer: "Buyer",
-  seller: "Seller",
-  vetter: "Vetter",
-  admin: "Admin",
+const ROLE_CONFIG = {
+  buyer: { label: "Buyer", icon: ShoppingBag, color: "bg-primary/10 text-primary" },
+  seller: { label: "Seller", icon: Tag, color: "bg-accent/10 text-accent" },
+  vetter: { label: "Vetter", icon: Wrench, color: "bg-chart-3/10 text-chart-3" },
+  pro_security: { label: "Pro Security", icon: Shield, color: "bg-purple-50 text-purple-600" },
+  admin: { label: "Admin", icon: Shield, color: "bg-destructive/10 text-destructive" },
 };
+
+const ALL_ROLES = ["buyer", "seller", "vetter", "pro_security"];
 
 const menuItems = [
   { icon: User, label: "Edit Profile", href: "/profile/edit" },
@@ -29,17 +32,33 @@ const menuItems = [
 ];
 
 export default function Profile() {
-  const { user } = useAuth();
-  const role = user?.app_role || "buyer";
+  const { user, refreshUser } = useAuth();
   const [deleting, setDeleting] = useState(false);
+  const [addingRole, setAddingRole] = useState(null);
 
-  const handleLogout = () => {
-    base44.auth.logout();
+  const enabledRoles = user?.app_roles?.length ? user.app_roles : user?.app_role ? [user.app_role] : ["buyer"];
+  const isAdmin = user?.role === "admin";
+  const currentMode = user?.active_mode || user?.app_role || "buyer";
+  const currentCfg = ROLE_CONFIG[currentMode] || ROLE_CONFIG.buyer;
+  const CurrentIcon = currentCfg.icon;
+
+  const unlockedRoles = ALL_ROLES.filter((r) => !enabledRoles.includes(r));
+
+  const handleAddRole = async (roleValue) => {
+    setAddingRole(roleValue);
+    const newRoles = [...enabledRoles, roleValue];
+    await base44.auth.updateMe({ app_roles: newRoles, app_role: user.app_role || roleValue });
+    await refreshUser();
+    setAddingRole(null);
+    if (roleValue === "vetter") {
+      window.location.href = "/vetter/onboarding";
+    }
   };
+
+  const handleLogout = () => base44.auth.logout();
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
-    // Delete vetter profile if exists, then sign out
     try {
       const profiles = await base44.entities.VetterProfile.filter({ user_email: user?.email });
       for (const p of profiles) await base44.entities.VetterProfile.delete(p.id);
@@ -52,7 +71,7 @@ export default function Profile() {
       <h1 className="text-xl font-heading font-bold text-foreground mb-6">Profile</h1>
 
       {/* Profile Card */}
-      <div className="p-5 bg-card rounded-2xl border border-border/60 shadow-sm mb-5">
+      <div className="p-5 bg-card rounded-2xl border border-border/60 shadow-sm mb-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
             {user?.avatar_url ? (
@@ -68,17 +87,72 @@ export default function Profile() {
               {user?.full_name || "Welcome"}
             </h2>
             <p className="text-muted-foreground text-[13px] truncate">{user?.email}</p>
-            <Badge variant="secondary" className="mt-1.5 text-[11px] font-medium bg-primary/10 text-primary">
-              <Shield className="w-3 h-3 mr-1" />
-              {roleLabels[role]}
-            </Badge>
+            {isAdmin && (
+              <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                <Shield className="w-3 h-3" /> Admin
+              </span>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Mode Switcher */}
+      <div className="mb-4">
+        <ModeSwitcher />
+      </div>
+
+      {/* Roles section */}
+      <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm mb-4">
+        <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          My Roles
+        </p>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {enabledRoles.map((r) => {
+            const cfg = ROLE_CONFIG[r] || ROLE_CONFIG.buyer;
+            const Icon = cfg.icon;
+            return (
+              <span key={r} className={cn("flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-xl", cfg.color)}>
+                <Icon className="w-3.5 h-3.5" />
+                {cfg.label}
+                {r === currentMode && <Check className="w-3 h-3 ml-0.5" />}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* Add more roles */}
+        {unlockedRoles.length > 0 && (
+          <div>
+            <p className="text-[11px] text-muted-foreground mb-2">Add another role:</p>
+            <div className="flex flex-wrap gap-2">
+              {unlockedRoles.map((r) => {
+                const cfg = ROLE_CONFIG[r] || ROLE_CONFIG.buyer;
+                const Icon = cfg.icon;
+                return (
+                  <button
+                    key={r}
+                    onClick={() => handleAddRole(r)}
+                    disabled={addingRole === r}
+                    className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-xl border border-dashed border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors disabled:opacity-50"
+                  >
+                    {addingRole === r ? (
+                      <div className="w-3 h-3 border border-muted-foreground/40 border-t-primary rounded-full animate-spin" />
+                    ) : (
+                      <Plus className="w-3 h-3" />
+                    )}
+                    <Icon className="w-3.5 h-3.5" />
+                    {cfg.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Vetter profile shortcut */}
-      {(role === "vetter") && (
-        <Link to="/vetter/profile" className="flex items-center gap-3 px-4 py-3.5 bg-card rounded-2xl border border-border/60 shadow-sm mb-5 hover:bg-muted/50 transition-colors">
+      {enabledRoles.includes("vetter") && (
+        <Link to="/vetter/profile" className="flex items-center gap-3 px-4 py-3.5 bg-card rounded-2xl border border-border/60 shadow-sm mb-4 hover:bg-muted/50 transition-colors">
           <User className="w-5 h-5 text-muted-foreground" />
           <span className="flex-1 text-[14px] font-medium text-foreground">My Vetter Profile</span>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />

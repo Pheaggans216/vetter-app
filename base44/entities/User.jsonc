@@ -10,41 +10,44 @@
       ],
       "default": "user"
     },
-    "isAdmin": {
-      "type": "boolean",
-      "default": false,
-      "description": "Grants admin access regardless of role field"
-    },
     "app_role": {
+      "type": "string",
+      "description": "Legacy single role field \u2014 kept for backward compatibility",
+      "enum": [
+        "buyer",
+        "seller",
+        "vetter",
+        "pro_security"
+      ]
+    },
+    "app_roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "buyer",
+          "seller",
+          "vetter",
+          "pro_security"
+        ]
+      },
+      "description": "All roles this user has enabled"
+    },
+    "active_mode": {
       "type": "string",
       "enum": [
         "buyer",
         "seller",
-        "vetter"
+        "vetter",
+        "pro_security"
       ],
-      "description": "The user's role within the Vetter marketplace"
+      "description": "Currently active mode/role the user is operating in"
     },
     "onboarded": {
       "type": "boolean",
       "default": false
     },
     "avatar_url": {
-      "type": "string",
-      "description": "Optional profile photo URL"
-    },
-    "phone": {
-      "type": "string"
-    },
-    "city": {
-      "type": "string"
-    },
-    "state": {
-      "type": "string"
-    },
-    "zip_code": {
-      "type": "string"
-    },
-    "bio": {
       "type": "string"
     }
   }

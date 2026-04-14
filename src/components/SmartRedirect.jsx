@@ -1,6 +1,6 @@
 /**
  * SmartRedirect — shown at "/" for logged-in users.
- * NEW users (onboarded=false or no app_role) always go to /onboarding.
+ * Supports multi-role users via active_mode; falls back to legacy app_role.
  */
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,15 +22,18 @@ export default function SmartRedirect() {
     }
 
     // Force onboarding if not complete OR no role assigned
-    if (!user.onboarded || !user.app_role) {
+    const hasRole = user.app_roles?.length > 0 || user.app_role;
+    if (!user.onboarded || !hasRole) {
       navigate("/onboarding", { replace: true });
       return;
     }
 
-    // Route by role
-    if (user.app_role === "vetter") {
+    // Use active_mode first, then fall back to legacy app_role
+    const mode = user.active_mode || user.app_role || "buyer";
+
+    if (mode === "vetter") {
       navigate("/vetter/dashboard", { replace: true });
-    } else if (user.app_role === "seller") {
+    } else if (mode === "seller") {
       navigate("/dashboard/seller", { replace: true });
     } else {
       navigate("/dashboard/buyer", { replace: true });
