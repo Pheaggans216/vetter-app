@@ -9,6 +9,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift, ShoppingBag, Tag, Wrench, Check, Plus } from "lucide-react";
+// Shield kept for the Admin badge only
 import { cn } from "@/lib/utils";
 import ModeSwitcher from "@/components/ModeSwitcher";
 
@@ -16,11 +17,10 @@ const ROLE_CONFIG = {
   buyer: { label: "Buyer", icon: ShoppingBag, color: "bg-primary/10 text-primary" },
   seller: { label: "Seller", icon: Tag, color: "bg-accent/10 text-accent" },
   vetter: { label: "Vetter", icon: Wrench, color: "bg-chart-3/10 text-chart-3" },
-  pro_security: { label: "Pro Security", icon: Shield, color: "bg-purple-50 text-purple-600" },
   admin: { label: "Admin", icon: Shield, color: "bg-destructive/10 text-destructive" },
 };
 
-const ALL_ROLES = ["buyer", "seller", "vetter", "pro_security"];
+const ALL_ROLES = ["buyer", "seller", "vetter"];
 
 const menuItems = [
   { icon: User, label: "Edit Profile", href: "/profile/edit" },
@@ -36,7 +36,10 @@ export default function Profile() {
   const [deleting, setDeleting] = useState(false);
   const [addingRole, setAddingRole] = useState(null);
 
-  const enabledRoles = user?.app_roles?.length ? user.app_roles : user?.app_role ? [user.app_role] : ["buyer"];
+  const rawRoles = user?.app_roles?.length ? user.app_roles : user?.app_role ? [user.app_role] : ["buyer"];
+  const enabledRoles = rawRoles.filter((r) => ROLE_CONFIG[r] && r !== "admin").length > 0
+    ? rawRoles.filter((r) => ROLE_CONFIG[r] && r !== "admin")
+    : ["buyer"];
   const isAdmin = user?.role === "admin";
   const currentMode = user?.active_mode || user?.app_role || "buyer";
   const unlockedRoles = ALL_ROLES.filter((r) => !enabledRoles.includes(r));

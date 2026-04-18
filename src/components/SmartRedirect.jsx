@@ -29,7 +29,9 @@ export default function SmartRedirect() {
     }
 
     // Use active_mode first, then fall back to legacy app_role
-    const mode = user.active_mode || user.app_role || "buyer";
+    // If mode is unknown (e.g. legacy pro_security), default to buyer
+    const rawMode = user.active_mode || user.app_role || "buyer";
+    const mode = ["buyer", "seller", "vetter"].includes(rawMode) ? rawMode : "buyer";
 
     if (mode === "vetter") {
       navigate("/vetter/dashboard", { replace: true });

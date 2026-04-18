@@ -3,20 +3,18 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Tag, Wrench, Shield, ChevronDown, Check } from "lucide-react";
+import { ShoppingBag, Tag, Wrench, ChevronDown, Check } from "lucide-react";
 
 const MODE_CONFIG = {
   buyer: { label: "Buyer", icon: ShoppingBag, color: "text-primary", bg: "bg-primary/10" },
   seller: { label: "Seller", icon: Tag, color: "text-accent", bg: "bg-accent/10" },
   vetter: { label: "Vetter", icon: Wrench, color: "text-chart-3", bg: "bg-chart-3/10" },
-  pro_security: { label: "Pro Security", icon: Shield, color: "text-purple-600", bg: "bg-purple-50" },
 };
 
 const MODE_ROUTES = {
   buyer: "/dashboard/buyer",
   seller: "/dashboard/seller",
   vetter: "/vetter/dashboard",
-  pro_security: "/dashboard/buyer", // fallback until pro_security dashboard exists
 };
 
 export default function ModeSwitcher({ compact = false }) {
@@ -26,14 +24,17 @@ export default function ModeSwitcher({ compact = false }) {
   const [switching, setSwitching] = useState(false);
 
   // Derive available modes: use app_roles if set, fall back to legacy app_role
-  const availableModes = user?.app_roles?.length
+  // Filter out any legacy pro_security entries
+  const rawModes = user?.app_roles?.length
     ? user.app_roles
     : user?.app_role
     ? [user.app_role]
     : ["buyer"];
+  const availableModes = rawModes.filter((m) => MODE_CONFIG[m]);
 
-  const currentMode = user?.active_mode || user?.app_role || "buyer";
-  const current = MODE_CONFIG[currentMode] || MODE_CONFIG.buyer;
+  const rawMode = user?.active_mode || user?.app_role || "buyer";
+  const currentMode = MODE_CONFIG[rawMode] ? rawMode : "buyer";
+  const current = MODE_CONFIG[currentMode];
   const CurrentIcon = current.icon;
 
   // Only show switcher if user has more than one mode

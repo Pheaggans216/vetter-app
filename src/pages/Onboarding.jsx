@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Shield, ShoppingBag, Wrench, Tag, Check } from "lucide-react";
+import { ShoppingBag, Wrench, Tag, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -28,13 +28,6 @@ const ROLES = [
     description: "Inspect items in person and earn money",
     icon: Wrench,
     color: "bg-chart-3/15 text-chart-3 border-chart-3/20",
-  },
-  {
-    value: "pro_security",
-    label: "Pro Security",
-    description: "Provide secure exchange presence and advanced verification",
-    icon: Shield,
-    color: "bg-purple-50 text-purple-600 border-purple-200",
   },
 ];
 
