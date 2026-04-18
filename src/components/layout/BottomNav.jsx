@@ -21,7 +21,7 @@ const sellerTabs = [
 ];
 
 const vetterTabs = [
-  { label: "Home", icon: Home, path: "/vetter/dashboard" },
+  { label: "Home", icon: Home, path: "/dashboard/vetter" },
   { label: "Jobs", icon: Briefcase, path: "/jobs" },
   { label: "Schedule", icon: Calendar, path: "/schedule" },
   { label: "Earnings", icon: DollarSign, path: "/earnings" },

@@ -3,7 +3,7 @@ import NotificationBell from "@/components/notifications/NotificationBell";
 import ModeSwitcher from "@/components/ModeSwitcher";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   Briefcase, MessageCircle, User, MapPin, ArrowRight,
   CheckCircle2, Clock, AlertCircle, DollarSign
@@ -55,6 +55,11 @@ export default function VetterDashboard() {
   const StatusIcon = statusCfg.icon;
   const isAvailable = profile?.available !== false;
   const isApproved = profile?.status === "active";
+
+  // Redirect pending/inactive vetters away from the dashboard
+  if (!loadingProfile && profile && profile.status !== "active") {
+    return <Navigate to="/vetter/application-received" replace />;
+  }
 
   if (loadingProfile) {
     return (

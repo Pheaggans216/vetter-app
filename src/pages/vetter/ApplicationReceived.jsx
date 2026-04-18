@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock, Home, Compass } from "lucide-react";
+import { CheckCircle2, Clock, Home, User } from "lucide-react";
 
 export default function ApplicationReceived() {
   return (
@@ -51,16 +51,16 @@ export default function ApplicationReceived() {
 
         {/* Buttons */}
         <div className="space-y-3">
-          <Link to="/home" className="block">
+          <Link to="/" className="block">
             <button className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold text-[15px] hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
               <Home className="w-4 h-4" />
               Back to Home
             </button>
           </Link>
-          <Link to="/map" className="block">
+          <Link to="/vetter/profile" className="block">
             <button className="w-full h-12 rounded-xl border border-border text-foreground font-semibold text-[15px] hover:bg-muted transition-colors flex items-center justify-center gap-2">
-              <Compass className="w-4 h-4" />
-              Continue Exploring
+              <User className="w-4 h-4" />
+              View My Profile
             </button>
           </Link>
         </div>

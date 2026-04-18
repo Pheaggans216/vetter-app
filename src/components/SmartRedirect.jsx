@@ -35,7 +35,18 @@ export default function SmartRedirect() {
     const mode = ["buyer", "seller", "vetter"].includes(rawMode) ? rawMode : "buyer";
 
     if (mode === "vetter") {
-      navigate("/vetter/dashboard", { replace: true });
+      // Check if vetter profile is approved before sending to dashboard
+      base44.entities.VetterProfile.filter({ user_email: user.email })
+        .then((profiles) => {
+          const profile = profiles[0];
+          if (!profile || profile.status !== "active") {
+            navigate("/vetter/application-received", { replace: true });
+          } else {
+            navigate("/vetter/dashboard", { replace: true });
+          }
+        })
+        .catch(() => navigate("/vetter/dashboard", { replace: true }));
+      return;
     } else if (mode === "seller") {
       navigate("/dashboard/seller", { replace: true });
     } else {
