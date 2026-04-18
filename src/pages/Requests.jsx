@@ -9,7 +9,8 @@ import RequestCard from "@/components/requests/RequestCard";
 
 export default function Requests() {
   const { user } = useAuth();
-  const isSeller = user?.app_role === "seller";
+  const activeMode = user?.active_mode || user?.app_role || "buyer";
+  const isSeller = activeMode === "seller";
   const filterKey = isSeller ? "seller_email" : "buyer_email";
 
   const { data: requests = [], isLoading, refetch } = useQuery({

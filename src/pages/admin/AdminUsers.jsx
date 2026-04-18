@@ -16,7 +16,7 @@ export default function AdminUsers() {
 
   const resetMutation = useMutation({
     mutationFn: (userId) =>
-      base44.entities.User.update(userId, { onboarded: false, app_role: null }),
+      base44.entities.User.update(userId, { onboarded: false, app_role: null, app_roles: [], active_mode: null }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast({ title: "Reset successful", description: "User will be sent to onboarding on next login." });
@@ -90,7 +90,7 @@ export default function AdminUsers() {
                     {u.id !== me?.id && (
                       <button
                         onClick={() => resetMutation.mutate(u.id)}
-                        disabled={resetMutation.isPending && resetMutation.variables === u.id}
+                        disabled={resetMutation.isPending}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-[12px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />

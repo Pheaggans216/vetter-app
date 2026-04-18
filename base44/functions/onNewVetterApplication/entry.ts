@@ -29,7 +29,6 @@ Deno.serve(async (req) => {
         title: "New Vetter Application 🆕",
         body: `${applicantName} (${data.user_email}) submitted a vetter application on ${signupDate}.`,
         link: "/admin/vetters",
-        request_id: data.id,
         read: false,
       });
 
