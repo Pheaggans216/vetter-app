@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import RequestCard from "@/components/requests/RequestCard";
+import { getCurrentMode } from "@/lib/roleState";
 
 export default function Requests() {
   const { user } = useAuth();
-  const activeMode = user?.active_mode || user?.app_role || "buyer";
-  const isSeller = activeMode === "seller";
+  const isSeller = getCurrentMode(user) === "seller";
   const filterKey = isSeller ? "seller_email" : "buyer_email";
 
   const { data: requests = [], isLoading, refetch } = useQuery({

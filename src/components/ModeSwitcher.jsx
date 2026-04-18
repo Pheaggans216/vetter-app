@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { getAppRoles, getCurrentMode } from "@/lib/roleState";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Tag, Wrench, ChevronDown, Check } from "lucide-react";
@@ -23,18 +24,11 @@ export default function ModeSwitcher({ compact = false }) {
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
 
-  // Derive available modes: use app_roles if set, fall back to legacy app_role
-  // Filter out any legacy pro_security entries
-  const rawModes = user?.app_roles?.length
-    ? user.app_roles
-    : user?.app_role
-    ? [user.app_role]
-    : ["buyer"];
-  const availableModes = rawModes.filter((m) => MODE_CONFIG[m]);
+  const normalizedRoles = getAppRoles(user);
+  const availableModes = normalizedRoles.length ? normalizedRoles : ["buyer"];
 
-  const rawMode = user?.active_mode || user?.app_role || "buyer";
-  const currentMode = MODE_CONFIG[rawMode] ? rawMode : "buyer";
-  const current = MODE_CONFIG[currentMode];
+  const currentMode = getCurrentMode(user);
+  const current = MODE_CONFIG[currentMode] || MODE_CONFIG.buyer;
   const CurrentIcon = current.icon;
 
   // Only show switcher if user has more than one mode
@@ -44,7 +38,7 @@ export default function ModeSwitcher({ compact = false }) {
     if (mode === currentMode || switching) return;
     setSwitching(true);
     setOpen(false);
-    await base44.auth.updateMe({ active_mode: mode, app_role: mode });
+    await base44.auth.updateMe({ active_mode: mode });
     await refreshUser();
     setSwitching(false);
     navigate(MODE_ROUTES[mode] || "/dashboard/buyer");

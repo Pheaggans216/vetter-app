@@ -3,9 +3,9 @@ import NotificationBell from "@/components/notifications/NotificationBell";
 import ModeSwitcher from "@/components/ModeSwitcher";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
-  Briefcase, MessageCircle, User, MapPin, ArrowRight,
+  Briefcase, Home, MessageCircle, User, MapPin, ArrowRight,
   CheckCircle2, Clock, AlertCircle, DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -54,12 +54,9 @@ export default function VetterDashboard() {
   const statusCfg = STATUS_CONFIG[profile?.status] || STATUS_CONFIG["pending_review"];
   const StatusIcon = statusCfg.icon;
   const isAvailable = profile?.available !== false;
-  const isApproved = profile?.status === "active";
-
-  // Redirect pending/inactive vetters away from the dashboard
-  if (!loadingProfile && profile && profile.status !== "active") {
-    return <Navigate to="/vetter/application-received" replace />;
-  }
+  const isApproved = profile?.status === "active" || profile?.status === "approved";
+  const isPendingReview = !!profile && !isApproved;
+  const hasJobActivity = pendingJobs.length > 0 || activeJobs.length > 0 || (profile?.total_inspections || 0) > 0;
 
   if (loadingProfile) {
     return (
@@ -81,6 +78,71 @@ export default function VetterDashboard() {
             Start Application
           </button>
         </Link>
+      </div>
+    );
+  }
+
+  if (isPendingReview) {
+    return (
+      <div className="px-5 pt-6 pb-10">
+        <div className="flex items-start justify-between mb-5">
+          <div>
+            <p className="text-[13px] text-muted-foreground font-medium mb-0.5">Vetter Dashboard</p>
+            <h1 className="text-[24px] font-heading font-bold text-foreground leading-tight">
+              Application under review
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <ModeSwitcher compact />
+            <NotificationBell />
+          </div>
+        </div>
+
+        <div className={cn("flex items-center gap-3 px-4 py-3 rounded-2xl border mb-4", statusCfg.color)}>
+          <StatusIcon className="w-4 h-4 shrink-0" />
+          <div className="flex-1">
+            <p className="text-[13px] font-semibold">Application: {statusCfg.label}</p>
+            <p className="text-[11px] opacity-75 mt-0.5">You're all set. We'll notify you once you're approved.</p>
+          </div>
+          <Link to="/vetter/profile">
+            <ArrowRight className="w-4 h-4 opacity-60" />
+          </Link>
+        </div>
+
+        <div className="p-5 bg-card rounded-2xl border border-border/60 shadow-sm mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+            <Clock className="w-6 h-6 text-amber-700" />
+          </div>
+          <h2 className="font-heading font-bold text-foreground text-[18px] mb-2">
+            Your Vetter profile is under review.
+          </h2>
+          <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
+            Thanks for completing your application. While you wait, you can head home, browse jobs, or review your profile details.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+            >
+              <Home className="w-4 h-4" />
+              Home
+            </Link>
+            <Link
+              to="/jobs"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+            >
+              <Briefcase className="w-4 h-4" />
+              Browse Jobs
+            </Link>
+            <Link
+              to="/vetter/profile"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              View Profile
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -168,6 +230,60 @@ export default function VetterDashboard() {
         <ShortcutCard icon={MessageCircle} label="Messages" to="/messages" />
         <ShortcutCard icon={DollarSign} label="Earnings" to="/earnings" />
       </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <Link
+          to="/"
+          className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 bg-card text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+        >
+          <Home className="w-4 h-4" />
+          Home
+        </Link>
+        <Link
+          to="/jobs"
+          className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 bg-card text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+        >
+          <Briefcase className="w-4 h-4" />
+          Browse Jobs
+        </Link>
+      </div>
+
+      {isApproved && !hasJobActivity && (
+        <div className="p-5 bg-card rounded-2xl border border-border/60 shadow-sm mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center mb-4">
+            <CheckCircle2 className="w-6 h-6 text-green-700" />
+          </div>
+          <h2 className="font-heading font-bold text-foreground text-[18px] mb-2">
+            You're approved! Start by browsing available jobs.
+          </h2>
+          <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
+            Your dashboard is ready. The best next step is to browse available jobs, finish your profile, or head back home.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link
+              to="/jobs"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <Briefcase className="w-4 h-4" />
+              Browse Jobs
+            </Link>
+            <Link
+              to="/vetter/profile"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              Complete Profile
+            </Link>
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+            >
+              <Home className="w-4 h-4" />
+              Get Started
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Service area */}
       {(profile.city || profile.state) && (

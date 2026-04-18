@@ -12,6 +12,7 @@ import StepLocation from "@/components/new-request/StepLocation";
 import StepMatching from "@/components/new-request/StepMatching";
 import StepSummary from "@/components/new-request/StepSummary";
 import StepConfirmation from "@/components/new-request/StepConfirmation";
+import { getCurrentMode } from "@/lib/roleState";
 
 const TOTAL_STEPS = 6;
 
@@ -47,7 +48,7 @@ export default function NewRequest() {
     },
   });
 
-  const isSeller = user?.app_role === "seller";
+  const isSeller = getCurrentMode(user) === "seller";
 
   const handleSubmit = () => {
     mutation.mutate({

@@ -9,9 +9,9 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Shield, LogOut, User, Settings, ChevronRight, HelpCircle, FileText, Bell, Gift, ShoppingBag, Tag, Wrench, Check, Plus } from "lucide-react";
-// Shield kept for the Admin badge only
 import { cn } from "@/lib/utils";
 import ModeSwitcher from "@/components/ModeSwitcher";
+import { getAppRoles, getCurrentMode } from "@/lib/roleState";
 
 const ROLE_CONFIG = {
   buyer: { label: "Buyer", icon: ShoppingBag, color: "bg-primary/10 text-primary" },
@@ -36,23 +36,23 @@ export default function Profile() {
   const [deleting, setDeleting] = useState(false);
   const [addingRole, setAddingRole] = useState(null);
 
-  const rawRoles = user?.app_roles?.length ? user.app_roles : user?.app_role ? [user.app_role] : ["buyer"];
-  const enabledRoles = rawRoles.filter((r) => ROLE_CONFIG[r] && r !== "admin").length > 0
-    ? rawRoles.filter((r) => ROLE_CONFIG[r] && r !== "admin")
-    : ["buyer"];
+  const enabledRoles = getAppRoles(user);
   const isAdmin = user?.role === "admin";
-  const currentMode = user?.active_mode || user?.app_role || "buyer";
+  const currentMode = getCurrentMode(user);
   const unlockedRoles = ALL_ROLES.filter((r) => !enabledRoles.includes(r));
 
   const handleAddRole = async (roleValue) => {
     setAddingRole(roleValue);
     const newRoles = [...enabledRoles, roleValue];
     // Also update active_mode to the new role so the user lands on its dashboard
-    await base44.auth.updateMe({
+    const updates = {
       app_roles: newRoles,
-      app_role: user.app_role || roleValue,
       active_mode: roleValue,
-    });
+    };
+    if (!user?.app_role) {
+      updates.app_role = newRoles[0] || roleValue;
+    }
+    await base44.auth.updateMe(updates);
     await refreshUser();
     setAddingRole(null);
     if (roleValue === "vetter") {

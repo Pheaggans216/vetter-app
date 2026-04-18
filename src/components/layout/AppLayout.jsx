@@ -1,5 +1,6 @@
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
+import { getCurrentMode, hasAnyAppRole } from "@/lib/roleState";
 import BottomNav from "./BottomNav";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,15 +12,12 @@ export default function AppLayout() {
 
   const isAdmin = user?.role === "admin" || user?.isAdmin;
 
-  // Guard: if not onboarded or no valid role, send to onboarding
-  const VALID_ROLES = ["buyer", "seller", "vetter"];
-  const hasRole = user?.app_roles?.some(r => VALID_ROLES.includes(r)) || VALID_ROLES.includes(user?.app_role);
+  const hasRole = hasAnyAppRole(user);
   if (user && !isAdmin && (!user.onboarded || !hasRole)) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Use active_mode if set, fall back to legacy app_role
-  const userRole = user?.active_mode || user?.app_role || "buyer";
+  const userRole = getCurrentMode(user);
   const isFullScreen = FULL_SCREEN_PAGES.includes(location.pathname);
 
   if (isFullScreen) {

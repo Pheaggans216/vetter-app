@@ -15,7 +15,7 @@ const SECTIONS = [
     title: "Core Pages",
     color: "bg-primary/10 text-primary border-primary/20",
     items: [
-      { label: "Home", path: "/home", icon: Home },
+      { label: "Home", path: "/", icon: Home },
       { label: "My Requests", path: "/requests", icon: FileText },
       { label: "Find Vetters (Map)", path: "/map", icon: MapPin },
       { label: "Messages / Chat", path: "/messages", icon: MessageCircle },

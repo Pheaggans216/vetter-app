@@ -45,12 +45,18 @@ import SmartRedirect from '@/components/SmartRedirect.jsx';
 import SellerDashboard from '@/pages/SellerDashboard';
 import Chat from '@/pages/Chat';
 import PublicVetterProfile from '@/pages/PublicVetterProfile';
+import RoleRoute from '@/components/RoleRoute';
+import VetterStatusRoute from '@/components/VetterStatusRoute';
 
 // Decides what to show at "/" — landing for guests, smart redirect for members
 function RootRoute() {
-  const { isAuthenticated, isLoadingAuth } = useAuth();
-  if (isLoadingAuth) return null;
-  if (isAuthenticated) return <SmartRedirect />;
+  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
+  if (isLoadingPublicSettings || isLoadingAuth) return <Landing />;
+
+  const isAdmin = user?.role === "admin" || user?.isAdmin;
+  const isReadyForAppRedirect = isAuthenticated && (isAdmin || user?.onboarded);
+
+  if (isReadyForAppRedirect) return <SmartRedirect />;
   return <Landing />;
 }
 
@@ -85,22 +91,32 @@ const AuthenticatedApp = () => {
       <Route path="/vetter/onboarding" element={<VetterOnboarding />} />
       <Route path="/vetter/application-received" element={<ApplicationReceived />} />
       <Route element={<AppLayout />}>
-        <Route path="/dashboard" element={<BuyerDashboard />} />
-        <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
-        <Route path="/dashboard/seller" element={<SellerDashboard />} />
-        <Route path="/vetter/dashboard" element={<VetterDashboard />} />
-        <Route path="/dashboard/vetter" element={<VetterDashboard />} />
+        <Route element={<RoleRoute allowedRoles={["buyer"]} />}>
+          <Route path="/dashboard" element={<BuyerDashboard />} />
+          <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={["seller"]} />}>
+          <Route path="/dashboard/seller" element={<SellerDashboard />} />
+        </Route>
+        <Route element={<RoleRoute allowedRoles={["vetter"]} />}>
+          <Route element={<VetterStatusRoute allowPendingReview />}>
+            <Route path="/vetter/profile" element={<VetterProfilePage />} />
+          </Route>
+          <Route element={<VetterStatusRoute />}>
+            <Route path="/vetter/dashboard" element={<VetterDashboard />} />
+            <Route path="/dashboard/vetter" element={<VetterDashboard />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/earnings" element={<Earnings />} />
+            <Route path="/jobs/:id/report" element={<SubmitReport />} />
+          </Route>
+        </Route>
         <Route path="/requests" element={<Requests />} />
         <Route path="/requests/new" element={<NewRequest />} />
         <Route path="/requests/:id" element={<RequestDetail />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:conversationId" element={<Chat />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/jobs" element={<Jobs />} />
-        <Route path="/schedule" element={<Schedule />} />
-        <Route path="/earnings" element={<Earnings />} />
-        <Route path="/vetter/profile" element={<VetterProfilePage />} />
-        <Route path="/jobs/:id/report" element={<SubmitReport />} />
         <Route path="/requests/:id/report" element={<ReportView />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/referrals" element={<Referrals />} />
@@ -108,16 +124,18 @@ const AuthenticatedApp = () => {
         <Route path="/map" element={<VetterMap />} />
         <Route path="/vetters/:id" element={<PublicVetterProfile />} />
       </Route>
-      <Route element={<AdminLayout />}>
-        <Route path="/admin" element={<AdminOverview />} />
-        <Route path="/admin/vetters" element={<AdminVetters />} />
-        <Route path="/admin/requests" element={<AdminRequests />} />
-        <Route path="/admin/disputes" element={<AdminDisputes />} />
-        <Route path="/admin/payments" element={<AdminPayments />} />
-        <Route path="/admin/flagged" element={<AdminFlagged />} />
-        <Route path="/admin/metrics" element={<AdminMetrics />} />
-        <Route path="/admin/sitemap" element={<SiteMap />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
+      <Route element={<RoleRoute requireAdmin />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<AdminOverview />} />
+          <Route path="/admin/vetters" element={<AdminVetters />} />
+          <Route path="/admin/requests" element={<AdminRequests />} />
+          <Route path="/admin/disputes" element={<AdminDisputes />} />
+          <Route path="/admin/payments" element={<AdminPayments />} />
+          <Route path="/admin/flagged" element={<AdminFlagged />} />
+          <Route path="/admin/metrics" element={<AdminMetrics />} />
+          <Route path="/admin/sitemap" element={<SiteMap />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

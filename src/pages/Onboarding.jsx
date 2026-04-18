@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Wrench, Tag, Check } from "lucide-react";
+import { Home, LogOut, ShoppingBag, Wrench, Tag, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -36,7 +36,7 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { isAuthenticated, logout, refreshUser } = useAuth();
 
   const toggleRole = (value) => {
     setSelectedRoles((prev) =>
@@ -90,6 +90,25 @@ export default function Onboarding() {
         transition={{ duration: 0.5 }}
         className="flex-1"
       >
+        <div className="flex items-center justify-between gap-3 mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            Back to Home
+          </Link>
+          {isAuthenticated && (
+            <button
+              onClick={() => logout(false)}
+              className="inline-flex items-center gap-2 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Log out
+            </button>
+          )}
+        </div>
+
         <div className="flex items-center gap-2 mb-8">
           <img
             src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png"
