@@ -148,7 +148,7 @@ export default function MatchingPanel({ request, onMatched }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {browseList.map((v, i) => (
+              {browseList.map((v) => (
                 <VetterMatchCard
                   key={v.id}
                   vetter={v}

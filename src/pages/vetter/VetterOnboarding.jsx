@@ -79,8 +79,13 @@ export default function VetterOnboarding() {
         secure_exchange_approved: false,
         certified_specialist: profile.service_types?.includes("specialist_vetting") || false,
       });
-      await base44.auth.updateMe({ app_role: "vetter", onboarded: true });
+      // Preserve existing roles and add vetter if not already present
+      const currentUser = await base44.auth.me();
+      const existingRoles = currentUser?.app_roles?.length ? currentUser.app_roles : currentUser?.app_role ? [currentUser.app_role] : [];
+      const newRoles = existingRoles.includes("vetter") ? existingRoles : [...existingRoles.filter(r => r !== "pro_security"), "vetter"];
+      await base44.auth.updateMe({ app_role: "vetter", app_roles: newRoles, active_mode: "vetter", onboarded: true });
       await refreshUser();
+      setSubmitting(false);
       navigate("/vetter/application-received");
     } catch (err) {
       setSubmitting(false);

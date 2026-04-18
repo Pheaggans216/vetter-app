@@ -21,8 +21,9 @@ export default function SmartRedirect() {
       return;
     }
 
-    // Force onboarding if not complete OR no role assigned
-    const hasRole = user.app_roles?.length > 0 || user.app_role;
+    // Force onboarding if not complete OR no valid role assigned
+    const VALID_ROLES = ["buyer", "seller", "vetter"];
+    const hasRole = user.app_roles?.some(r => VALID_ROLES.includes(r)) || VALID_ROLES.includes(user.app_role);
     if (!user.onboarded || !hasRole) {
       navigate("/onboarding", { replace: true });
       return;

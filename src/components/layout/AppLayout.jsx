@@ -11,8 +11,9 @@ export default function AppLayout() {
 
   const isAdmin = user?.role === "admin" || user?.isAdmin;
 
-  // Guard: if not onboarded or no role, send to onboarding
-  const hasRole = user?.app_roles?.length > 0 || user?.app_role;
+  // Guard: if not onboarded or no valid role, send to onboarding
+  const VALID_ROLES = ["buyer", "seller", "vetter"];
+  const hasRole = user?.app_roles?.some(r => VALID_ROLES.includes(r)) || VALID_ROLES.includes(user?.app_role);
   if (user && !isAdmin && (!user.onboarded || !hasRole)) {
     return <Navigate to="/onboarding" replace />;
   }
