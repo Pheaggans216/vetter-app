@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { ClipboardList, CheckCircle2, Users, DollarSign, Clock, TrendingUp, Repeat, Star } from "lucide-react";
+import { ClipboardList, CheckCircle2, Users, DollarSign, Clock, TrendingUp, Repeat, Star, AlertCircle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 
 const SERVICE_PRICES = { standard_verification: 39, specialist_vetting: 89, secure_exchange_presence: 149 };
 
@@ -39,12 +40,37 @@ export default function AdminOverview() {
 
   const recentRequests = requests.slice(0, 6);
 
+  const newApps = vetters
+    .filter(v => v.status === "pending_review")
+    .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+
   return (
     <div className="p-7">
       <div className="mb-7">
         <h1 className="text-[22px] font-heading font-bold text-foreground">Platform Overview</h1>
         <p className="text-muted-foreground text-[13px] mt-0.5">Real-time snapshot of Vetter operations.</p>
       </div>
+
+      {/* Pending Applications Banner */}
+      {newApps.length > 0 && (
+        <Link to="/admin/vetters">
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4 hover:bg-amber-100 transition-colors cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-5 h-5 text-amber-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-heading font-bold text-amber-800 text-[14px]">
+                {newApps.length} Vetter Application{newApps.length > 1 ? "s" : ""} Awaiting Review
+              </p>
+              <p className="text-[12px] text-amber-700 mt-0.5">
+                Most recent: {newApps[0].display_name} ({newApps[0].user_email}) — {formatDistanceToNow(new Date(newApps[0].created_date), { addSuffix: true })}
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-amber-600 shrink-0" />
+          </div>
+        </Link>
+      )}
+
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <MetricCard icon={ClipboardList} label="Total Requests" value={requests.length} color="bg-primary/10 text-primary" />

@@ -63,8 +63,8 @@ export default function StepDocuments({ profile, update }) {
           onUpload={handleCertUpload}
         />
         <UploadBox
-          label="Profile Photo"
-          description="Clear headshot photo"
+          label="Profile Photo (optional)"
+          description="Clear headshot — skip if you'd like to add later"
           icon={User}
           value={profile.avatar_url}
           onUpload={(url) => update({ avatar_url: url })}
