@@ -331,7 +331,7 @@ export default function VetterMap() {
                         key={v.id}
                         position={[v._coord.lat, v._coord.lng]}
                         icon={makePinIcon(v, selectedVetter?.id === v.id)}
-                        eventHandlers={{ click: () => handleSelectVetter(v) }}
+                        eventHandlers={{ click: () => handleMarkerClick(v) }}
                       />
                     );
                   })}
