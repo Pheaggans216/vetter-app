@@ -67,8 +67,12 @@ export default function Onboarding() {
       clearTimeout(timeout);
       setSaving(false);
 
-      if (selectedRoles.includes("vetter")) {
-        navigate("/vetter/onboarding");
+      if (selectedRoles.includes("vetter") && !selectedRoles.includes("buyer") && !selectedRoles.includes("seller")) {
+        // Vetter-only: go home, they can start vetter onboarding from there
+        navigate("/");
+      } else if (selectedRoles.includes("vetter")) {
+        // Multi-role including vetter: land on the primary non-vetter dashboard, vetter onboarding is optional
+        navigate("/");
       } else if (primaryRole === "seller") {
         navigate("/dashboard/seller");
       } else {

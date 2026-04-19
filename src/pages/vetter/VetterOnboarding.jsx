@@ -128,8 +128,9 @@ export default function VetterOnboarding() {
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
       {/* Header */}
       <div className="px-5 pt-8 pb-4">
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center justify-between mb-6">
           <img src="https://media.base44.com/images/public/69d2a34ea0832e2ee10bd09e/1703aad83_image.png" alt="Vetter" className="h-12 w-auto" style={{ mixBlendMode: 'multiply' }} />
+          <a href="/" className="text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors">← Home</a>
         </div>
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1.5">
