@@ -96,7 +96,8 @@ export default function VetterMap() {
     queryFn: () => base44.entities.VetterProfile.filter({ status: "active" }),
   });
 
-  const allVetters = rawVetters.length > 0 ? rawVetters : DEMO_VETTERS;
+  // Only use real vetters — no demo fallback per requirements
+  const allVetters = rawVetters;
 
   // Geocode vetters (city/state) once loaded — cache per vetter id
   useEffect(() => {
@@ -331,7 +332,7 @@ export default function VetterMap() {
                         key={v.id}
                         position={[v._coord.lat, v._coord.lng]}
                         icon={makePinIcon(v, selectedVetter?.id === v.id)}
-                        eventHandlers={{ click: () => handleMarkerClick(v) }}
+                        eventHandlers={{ click: () => handleSelectVetter(v) }}
                       />
                     );
                   })}
@@ -438,9 +439,7 @@ export default function VetterMap() {
           <LegendItem color="#22c55e" label="Available" />
           <LegendItem color="#f97316" label="Busy" />
           <LegendItem color="#3b82f6" label="Top-Rated" />
-          {rawVetters.length === 0 && (
-            <span className="text-[10px] text-muted-foreground ml-auto shrink-0 italic">Demo data</span>
-          )}
+
         </div>
       )}
     </div>
