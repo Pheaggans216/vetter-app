@@ -48,15 +48,8 @@ import PublicVetterProfile from '@/pages/PublicVetterProfile';
 import RoleRoute from '@/components/RoleRoute';
 import VetterStatusRoute from '@/components/VetterStatusRoute';
 
-// Decides what to show at "/" — landing for guests, smart redirect for members
+// "/" always shows the landing page — for everyone
 function RootRoute() {
-  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
-  if (isLoadingPublicSettings || isLoadingAuth) return <Landing />;
-
-  const isAdmin = user?.role === "admin" || user?.isAdmin;
-  const isReadyForAppRedirect = isAuthenticated && (isAdmin || user?.onboarded);
-
-  if (isReadyForAppRedirect) return <SmartRedirect />;
   return <Landing />;
 }
 

@@ -1,8 +1,22 @@
 import { Link } from "react-router-dom";
 import { navLogoRef } from "@/lib/navLogoRef";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
+import { getCurrentMode, hasAnyAppRole } from "@/lib/roleState";
+
+const DASHBOARD_ROUTES = {
+  buyer: "/dashboard/buyer",
+  seller: "/dashboard/seller",
+  vetter: "/vetter/dashboard",
+};
 
 export default function LandingNav() {
+  const { user, isAuthenticated } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.isAdmin;
+  const mode = getCurrentMode(user);
+  const dashboardPath = isAdmin ? "/admin" : (DASHBOARD_ROUTES[mode] || "/dashboard/buyer");
+  const isOnboarded = user?.onboarded && hasAnyAppRole(user);
+
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/40">
       <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
@@ -15,26 +29,57 @@ export default function LandingNav() {
             style={{ mixBlendMode: 'multiply' }}
           />
         </Link>
-        
+
         <div className="flex items-center gap-4">
           <a href="#how-it-works" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
             How it Works
           </a>
-          <Link to="/vetter/onboarding" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
-            Become a Vetter
-          </Link>
-          <button
-            onClick={() => base44.auth.redirectToLogin()}
-            className="h-8 px-4 rounded-lg border border-border text-foreground text-[13px] font-semibold hover:bg-muted transition-colors">
-            Login
-          </button>
-          <button
-            onClick={() => base44.auth.redirectToLogin()}
-            className="h-8 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors">
-            Sign Up
-          </button>
+          {!isAuthenticated && (
+            <Link to="/vetter/onboarding" className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Become a Vetter
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <>
+              {isOnboarded && (
+                <Link
+                  to={dashboardPath}
+                  className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium"
+                >
+                  My Dashboard
+                </Link>
+              )}
+              {!isOnboarded && (
+                <Link
+                  to="/onboarding"
+                  className="hidden sm:block text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium"
+                >
+                  Continue Setup
+                </Link>
+              )}
+              <button
+                onClick={() => base44.auth.logout()}
+                className="h-8 px-4 rounded-lg border border-border text-foreground text-[13px] font-semibold hover:bg-muted transition-colors"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => base44.auth.redirectToLogin()}
+                className="h-8 px-4 rounded-lg border border-border text-foreground text-[13px] font-semibold hover:bg-muted transition-colors">
+                Login
+              </button>
+              <button
+                onClick={() => base44.auth.redirectToLogin()}
+                className="h-8 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors">
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
       </div>
-    </nav>);
-
+    </nav>
+  );
 }

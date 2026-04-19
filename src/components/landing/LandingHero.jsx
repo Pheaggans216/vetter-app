@@ -1,7 +1,21 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck, ArrowRight, ChevronDown } from "lucide-react";
+import { ShieldCheck, ArrowRight, ChevronDown, LayoutDashboard } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import { getCurrentMode, hasAnyAppRole } from "@/lib/roleState";
+
+const DASHBOARD_ROUTES = {
+  buyer: "/dashboard/buyer",
+  seller: "/dashboard/seller",
+  vetter: "/vetter/dashboard",
+};
 
 export default function LandingHero() {
+  const { user, isAuthenticated } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.isAdmin;
+  const mode = getCurrentMode(user);
+  const isOnboarded = isAuthenticated && user?.onboarded && hasAnyAppRole(user);
+  const dashboardPath = isAdmin ? "/admin" : (DASHBOARD_ROUTES[mode] || "/dashboard/buyer");
+
   return (
     <section className="relative overflow-hidden">
       {/* Gradient background */}
@@ -29,13 +43,23 @@ export default function LandingHero() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/requests/new"
-            className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
-          >
-            Request a Vetter
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          {isOnboarded ? (
+            <Link
+              to={dashboardPath}
+              className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Go to My Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/requests/new"
+              className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
+            >
+              Request a Vetter
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
           <a
             href="#how-it-works"
             className="inline-flex items-center gap-2 h-13 px-6 py-3.5 rounded-xl border border-border bg-card text-[15px] font-medium text-foreground hover:bg-muted/50 transition-colors"
