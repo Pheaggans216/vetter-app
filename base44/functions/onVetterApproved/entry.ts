@@ -24,6 +24,15 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: "No user email found" });
     }
 
+    await base44.asServiceRole.entities.Notification.create({
+      recipient_email: userEmail,
+      type: "status_change",
+      title: "You're approved! 🎉",
+      body: "You're approved! Start browsing jobs now.",
+      link: "/jobs",
+      read: false,
+    });
+
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: userEmail,
       subject: "You're Approved on Vetter 🎉",
