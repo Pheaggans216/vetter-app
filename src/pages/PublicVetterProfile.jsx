@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,11 +41,14 @@ const availabilityDays = [
 
 export default function PublicVetterProfile() {
   const navigate = useNavigate();
-  const vetterId = window.location.pathname.split("/").pop();
+  const { id: vetterId } = useParams();
 
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ["public-vetter-profile", vetterId],
-    queryFn: () => base44.entities.VetterProfile.filter({ id: vetterId }),
+    queryFn: async () => {
+      const all = await base44.entities.VetterProfile.list();
+      return all.filter(p => p.id === vetterId);
+    },
     enabled: !!vetterId,
   });
 

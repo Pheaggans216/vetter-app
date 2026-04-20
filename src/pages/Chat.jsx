@@ -21,7 +21,11 @@ export default function Chat() {
 
   const { data: conversations = [] } = useQuery({
     queryKey: ["conversation", conversationId],
-    queryFn: () => base44.entities.Conversation.filter({ id: conversationId }),
+    queryFn: async () => {
+      const all = await base44.entities.Conversation.list();
+      return all.filter(c => c.id === conversationId);
+    },
+    enabled: !!conversationId,
   });
   const conversation = conversations[0];
   const otherParticipant = conversation?.participants?.find((p) => p !== user?.email) || "";

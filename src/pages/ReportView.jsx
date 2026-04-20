@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -49,17 +49,20 @@ const RECOMMENDATION_CONFIG = {
 };
 
 export default function ReportView() {
-  // Path is /requests/:id/report — need second-to-last segment, not last
-  const requestId = window.location.pathname.split("/").slice(-2)[0];
+  const { id: requestId } = useParams();
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["report", requestId],
     queryFn: () => base44.entities.Report.filter({ request_id: requestId }),
+    enabled: !!requestId,
   });
 
   const { data: requests = [] } = useQuery({
     queryKey: ["vetting-request", requestId],
-    queryFn: () => base44.entities.VettingRequest.filter({ id: requestId }),
+    queryFn: async () => {
+      const all = await base44.entities.VettingRequest.list();
+      return all.filter(r => r.id === requestId);
+    },
     enabled: !!requestId,
   });
 

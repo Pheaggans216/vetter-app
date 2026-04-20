@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, ExternalLink, MapPin, Clock, CheckCircle2,
   UserCheck, Calendar, DollarSign, ShieldCheck, MessageCircle, User,
@@ -41,7 +41,7 @@ const serviceLabels = {
 };
 
 export default function RequestDetail() {
-  const id = window.location.pathname.split("/").pop();
+  const { id } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -63,7 +63,11 @@ export default function RequestDetail() {
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["vetting-request", id],
-    queryFn: () => base44.entities.VettingRequest.filter({ id }),
+    queryFn: async () => {
+      const all = await base44.entities.VettingRequest.list();
+      return all.filter(r => r.id === id);
+    },
+    enabled: !!id,
   });
 
   const request = requests[0];
