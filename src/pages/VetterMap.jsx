@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { MapContainer, TileLayer, Marker, useMap, Circle } from "react-leaflet";
@@ -33,8 +34,8 @@ function makePinIcon(vetter, selected) {
     ? getBusyIconSvg(size)
     : getAvailableIconSvg(size);
   return L.divIcon({
-    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.7))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))'}">${svgHtml}</div>`,
-    className: "",
+    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.7))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))'}; pointer-events: none; cursor: pointer;">${svgHtml}</div>`,
+    className: "leaflet-vetter-pin",
     iconSize: [size, pinH],
     iconAnchor: [size / 2, pinH],
   });
@@ -63,6 +64,7 @@ const DEMO_VETTERS = [
 ];
 
 export default function VetterMap() {
+  const navigate = useNavigate();
   const [view, setView] = useState("map"); // "map" | "list"
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -332,7 +334,9 @@ export default function VetterMap() {
                         key={v.id}
                         position={[v._coord.lat, v._coord.lng]}
                         icon={makePinIcon(v, selectedVetter?.id === v.id)}
-                        eventHandlers={{ click: () => handleSelectVetter(v) }}
+                        eventHandlers={{
+                          click: () => navigate(`/vetters/${v.id}`),
+                        }}
                       />
                     );
                   })}
