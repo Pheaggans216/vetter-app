@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -53,11 +53,14 @@ export default function SubmitReport() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const jobId = window.location.pathname.split("/").slice(-2)[0];
+  const { id: jobId } = useParams();
 
   const { data: jobs = [] } = useQuery({
     queryKey: ["job-for-report", jobId],
-    queryFn: () => base44.entities.VettingRequest.filter({ id: jobId }),
+    queryFn: async () => {
+      const all = await base44.entities.VettingRequest.list();
+      return all.filter(r => r.id === jobId);
+    },
     enabled: !!jobId,
   });
   const job = jobs[0];

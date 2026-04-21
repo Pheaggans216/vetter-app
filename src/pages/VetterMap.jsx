@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { MapContainer, TileLayer, Marker, CircleMarker, useMap, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, useMap, Circle } from "react-leaflet";
 import L from "leaflet";
 import { motion, AnimatePresence } from "framer-motion";
 import { Map, List, Search, ChevronDown, Shield, X, Locate } from "lucide-react";
