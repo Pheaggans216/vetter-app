@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { MapContainer, TileLayer, Marker, useMap, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, CircleMarker, useMap, Circle } from "react-leaflet";
 import L from "leaflet";
-import { renderToStaticMarkup } from "react-dom/server";
 import { motion, AnimatePresence } from "framer-motion";
 import { Map, List, Search, ChevronDown, Shield, X, Locate } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -15,30 +14,16 @@ import "leaflet/dist/leaflet.css";
 import VetterDetailPanel from "@/components/map/VetterDetailPanel";
 import VetterListCard from "@/components/map/VetterListCard";
 import MapFilters from "@/components/map/MapFilters";
-import { getAvailableIconSvg, getBusyIconSvg, getTopRatedIconSvg } from "@/components/map/VetterMapIcons";
 import { geocodeLocation, cityFallback, distanceMiles, stableJitter } from "@/lib/geocode";
 
 // ── Leaflet icon fix (no default icon 404) ──────────────────────────────────
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl: "", shadowUrl: "" });
 
-// Build a Leaflet DivIcon using the exact uploaded logo
-function makePinIcon(vetter, selected) {
-  const isTopRated = vetter.rating >= 4.8 || vetter.secure_exchange_approved;
-  const isBusy = vetter.available === false;
-  const size = selected ? 52 : 42;
-  const pinH = Math.round(size * 1.35);
-  const svgHtml = isTopRated
-    ? getTopRatedIconSvg(size)
-    : isBusy
-    ? getBusyIconSvg(size)
-    : getAvailableIconSvg(size);
-  return L.divIcon({
-    html: `<div style="filter:${selected ? 'drop-shadow(0 0 6px rgba(59,130,246,0.7))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))'}; pointer-events: none; cursor: pointer;">${svgHtml}</div>`,
-    className: "leaflet-vetter-pin",
-    iconSize: [size, pinH],
-    iconAnchor: [size / 2, pinH],
-  });
+function getVetterColor(vetter) {
+  if (vetter.rating >= 4.8 || vetter.secure_exchange_approved) return "#3b82f6"; // blue = top rated
+  if (vetter.available === false) return "#f97316"; // orange = busy
+  return "#22c55e"; // green = available
 }
 
 // Fly to location helper component
@@ -318,22 +303,30 @@ export default function VetterMap() {
                   )}
 
                   {/* User location marker */}
-                  {userLocation && (() => {
-                    const userIcon = L.divIcon({
-                      html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:3px solid white;box-shadow:0 0 0 3px rgba(59,130,246,0.3)"></div>`,
-                      className: "", iconSize: [16, 16], iconAnchor: [8, 8],
-                    });
-                    return <Marker position={userLocation} icon={userIcon} />;
-                  })()}
+                  {userLocation && (
+                    <CircleMarker
+                      center={userLocation}
+                      radius={8}
+                      pathOptions={{ color: "white", weight: 3, fillColor: "#3b82f6", fillOpacity: 1 }}
+                    />
+                  )}
 
                   {/* Vetter pins */}
                   {filteredVetters.map(v => {
                     if (!v._coord) return null;
+                    const color = getVetterColor(v);
+                    const isSelected = selectedVetter?.id === v.id;
                     return (
-                      <Marker
+                      <CircleMarker
                         key={v.id}
-                        position={[v._coord.lat, v._coord.lng]}
-                        icon={makePinIcon(v, selectedVetter?.id === v.id)}
+                        center={[v._coord.lat, v._coord.lng]}
+                        radius={isSelected ? 16 : 12}
+                        pathOptions={{
+                          color: "white",
+                          weight: 2.5,
+                          fillColor: color,
+                          fillOpacity: 1,
+                        }}
                         eventHandlers={{
                           click: () => navigate(`/vetters/${v.id}`),
                         }}
