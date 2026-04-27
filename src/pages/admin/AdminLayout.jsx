@@ -2,13 +2,14 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import {
   LayoutDashboard, Users, ClipboardList, ShieldAlert,
-  CreditCard, BarChart2, Shield, Map, UserCog
+  CreditCard, BarChart2, Shield, Map, UserCog, ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Overview", icon: LayoutDashboard, path: "/admin" },
   { label: "Users", icon: UserCog, path: "/admin/users" },
+  { label: "Listings & Jobs", icon: ShoppingBag, path: "/admin/listings" },
   { label: "Vetter Applications", icon: Users, path: "/admin/vetters" },
   { label: "Job Requests", icon: ClipboardList, path: "/admin/requests" },
   { label: "Disputes", icon: ShieldAlert, path: "/admin/disputes" },
@@ -45,7 +46,7 @@ export default function AdminLayout() {
           <span className="font-heading font-bold text-foreground text-[15px]">Admin</span>
         </div>
 
-        <nav className="flex-1 py-3 px-2 space-y-0.5">
+        <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = item.path === "/admin"
               ? location.pathname === "/admin"

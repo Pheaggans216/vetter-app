@@ -1,0 +1,86 @@
+{
+  "name": "Listing",
+  "type": "object",
+  "properties": {
+    "seller_email": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "cars_and_motorcycles",
+        "electronics",
+        "appliances",
+        "jewelry_and_watches",
+        "luxury_fashion_and_handbags",
+        "furniture",
+        "tools_and_equipment",
+        "rental_or_property_verification",
+        "other"
+      ]
+    },
+    "price": {
+      "type": "number"
+    },
+    "description": {
+      "type": "string"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "location_city": {
+      "type": "string"
+    },
+    "location_state": {
+      "type": "string"
+    },
+    "location_zip": {
+      "type": "string"
+    },
+    "meetup_notes": {
+      "type": "string"
+    },
+    "preferred_availability": {
+      "type": "string"
+    },
+    "seller_splits_cost": {
+      "type": "boolean",
+      "default": false
+    },
+    "seller_pays_upfront": {
+      "type": "boolean",
+      "default": false
+    },
+    "vetting_status": {
+      "type": "string",
+      "enum": [
+        "not_vetted",
+        "vetter_requested",
+        "awaiting_payment",
+        "payment_secured",
+        "vetter_assigned",
+        "in_progress",
+        "vetted",
+        "vetted_with_caution",
+        "failed_verification"
+      ],
+      "default": "not_vetted"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "seller_email",
+    "title",
+    "category",
+    "price"
+  ]
+}

@@ -4,7 +4,7 @@ import ModeSwitcher from "@/components/ModeSwitcher";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Link } from "react-router-dom";
-import { FileText, MapPin, MessageCircle, User, Plus, ArrowRight, ShieldCheck } from "lucide-react";
+import { FileText, MapPin, MessageCircle, User, Plus, ArrowRight, ShieldCheck, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -58,19 +58,33 @@ export default function BuyerDashboard() {
         </div>
       </div>
 
-      {/* Quick action — new request */}
-      <Link to="/requests/new" className="block mb-5">
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5" />
+      {/* Quick actions */}
+      <div className="space-y-2.5 mb-5">
+        <Link to="/listings" className="block">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <p className="font-heading font-bold text-[15px]">Browse & Verify Listings</p>
+              <p className="text-primary-foreground/70 text-[12px]">Don't buy blind — verify before you pay</p>
+            </div>
+            <ArrowRight className="w-5 h-5 opacity-70" />
           </div>
-          <div className="flex-1">
-            <p className="font-heading font-bold text-[15px]">Get an item inspected</p>
-            <p className="text-primary-foreground/70 text-[12px]">Submit a new vetting request</p>
+        </Link>
+        <Link to="/requests/new" className="block">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/60">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Plus className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-heading font-bold text-[15px] text-foreground">Submit a Vetting Request</p>
+              <p className="text-muted-foreground text-[12px]">Got a link from another marketplace?</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground opacity-70" />
           </div>
-          <ArrowRight className="w-5 h-5 opacity-70" />
-        </div>
-      </Link>
+        </Link>
+      </div>
 
       {/* Shortcut grid */}
       <div className="grid grid-cols-3 gap-3 mb-6">

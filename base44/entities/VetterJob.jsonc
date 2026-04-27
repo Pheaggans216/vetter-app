@@ -1,0 +1,142 @@
+{
+  "name": "VetterJob",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string"
+    },
+    "vetting_request_id": {
+      "type": "string"
+    },
+    "buyer_email": {
+      "type": "string"
+    },
+    "seller_email": {
+      "type": "string"
+    },
+    "vetter_email": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "standard",
+        "expert"
+      ],
+      "default": "standard"
+    },
+    "base_price": {
+      "type": "number"
+    },
+    "distance_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "rush_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "high_value_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "total_price": {
+      "type": "number"
+    },
+    "vetter_payout": {
+      "type": "number"
+    },
+    "platform_fee": {
+      "type": "number"
+    },
+    "fee_split": {
+      "type": "string",
+      "enum": [
+        "buyer_pays_all",
+        "split_with_seller",
+        "seller_pays_all"
+      ],
+      "default": "buyer_pays_all"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_payment",
+        "payment_secured",
+        "matching",
+        "vetter_assigned",
+        "in_progress",
+        "report_ready",
+        "completed",
+        "disputed",
+        "cancelled"
+      ],
+      "default": "pending_payment"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "held",
+        "released",
+        "refunded"
+      ],
+      "default": "unpaid"
+    },
+    "is_rush": {
+      "type": "boolean",
+      "default": false
+    },
+    "item_value_tier": {
+      "type": "string",
+      "enum": [
+        "under_1k",
+        "1k_5k",
+        "5k_20k",
+        "over_20k"
+      ],
+      "default": "under_1k"
+    },
+    "location_city": {
+      "type": "string"
+    },
+    "location_state": {
+      "type": "string"
+    },
+    "time_window": {
+      "type": "string"
+    },
+    "report_id": {
+      "type": "string"
+    },
+    "buyer_confirmed_at": {
+      "type": "string"
+    },
+    "dispute_opened_at": {
+      "type": "string"
+    },
+    "dispute_reason": {
+      "type": "string"
+    },
+    "buyer_rating_vetter": {
+      "type": "number"
+    },
+    "seller_rating_vetter": {
+      "type": "number"
+    },
+    "vetter_rating_buyer": {
+      "type": "number"
+    },
+    "vetter_rating_seller": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "listing_id",
+    "buyer_email",
+    "seller_email",
+    "tier",
+    "total_price"
+  ]
+}

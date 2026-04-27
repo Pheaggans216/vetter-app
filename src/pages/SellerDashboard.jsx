@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Link } from "react-router-dom";
-import { ShieldCheck, FileText, ArrowRight, Tag } from "lucide-react";
+import { ShieldCheck, FileText, ArrowRight, Tag, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
@@ -52,19 +52,33 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* CTA */}
-      <Link to="/requests/new" className="block mb-5">
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5" />
+      {/* CTAs */}
+      <div className="space-y-2.5 mb-5">
+        <Link to="/listings/new" className="block">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <p className="font-heading font-bold text-[15px]">List an Item</p>
+              <p className="text-primary-foreground/70 text-[12px]">Add verification to boost buyer confidence</p>
+            </div>
+            <ArrowRight className="w-5 h-5 opacity-70" />
           </div>
-          <div className="flex-1">
-            <p className="font-heading font-bold text-[15px]">Verify a listing</p>
-            <p className="text-primary-foreground/70 text-[12px]">Request third-party verification for your item</p>
+        </Link>
+        <Link to="/listings" className="block">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/60">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+              <Tag className="w-5 h-5 text-accent" />
+            </div>
+            <div className="flex-1">
+              <p className="font-heading font-bold text-[15px] text-foreground">My Listings</p>
+              <p className="text-muted-foreground text-[12px]">Manage your items for sale</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground" />
           </div>
-          <ArrowRight className="w-5 h-5 opacity-70" />
-        </div>
-      </Link>
+        </Link>
+      </div>
 
       {/* Info banner */}
       <div className="flex items-start gap-3 p-4 rounded-2xl bg-accent/10 border border-accent/20 mb-6">

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, MapPin } from "lucide-react";
+import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, MapPin, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -7,22 +7,22 @@ import { useAuth } from "@/lib/AuthContext";
 
 const buyerTabs = [
   { label: "Home", icon: Home, path: "/dashboard/buyer" },
-  { label: "Requests", icon: FileText, path: "/requests" },
-  { label: "Find Vetters", icon: MapPin, path: "/map" },
+  { label: "Listings", icon: ShoppingBag, path: "/listings" },
+  { label: "Map", icon: MapPin, path: "/map" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/profile" },
 ];
 
 const sellerTabs = [
   { label: "Home", icon: Home, path: "/dashboard/seller" },
-  { label: "Requests", icon: FileText, path: "/requests" },
+  { label: "Listings", icon: ShoppingBag, path: "/listings" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/profile" },
 ];
 
 const vetterTabs = [
   { label: "Home", icon: Home, path: "/dashboard/vetter" },
-  { label: "Jobs", icon: Briefcase, path: "/jobs" },
+  { label: "Jobs", icon: Briefcase, path: "/vetter/jobs" },
   { label: "Schedule", icon: Calendar, path: "/schedule" },
   { label: "Earnings", icon: DollarSign, path: "/earnings" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },

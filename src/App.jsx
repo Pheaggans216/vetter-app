@@ -47,6 +47,13 @@ import Chat from '@/pages/Chat';
 import PublicVetterProfile from '@/pages/PublicVetterProfile';
 import RoleRoute from '@/components/RoleRoute';
 import VetterStatusRoute from '@/components/VetterStatusRoute';
+import Listings from '@/pages/Listings';
+import NewListing from '@/pages/NewListing';
+import ListingDetail from '@/pages/ListingDetail';
+import ListingReport from '@/pages/ListingReport';
+import VetterJobs from '@/pages/vetter/VetterJobs';
+import VetterJobReport from '@/pages/vetter/VetterJobReport';
+import AdminListings from '@/pages/admin/AdminListings';
 
 // "/" always shows the landing page — for everyone
 function RootRoute() {
@@ -92,17 +99,19 @@ const AuthenticatedApp = () => {
           <Route path="/dashboard/seller" element={<SellerDashboard />} />
         </Route>
         <Route element={<RoleRoute allowedRoles={["vetter"]} />}>
-          <Route element={<VetterStatusRoute allowPendingReview />}>
-            <Route path="/vetter/profile" element={<VetterProfilePage />} />
-          </Route>
-          <Route element={<VetterStatusRoute />}>
-            <Route path="/vetter/dashboard" element={<VetterDashboard />} />
-            <Route path="/dashboard/vetter" element={<VetterDashboard />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/earnings" element={<Earnings />} />
-            <Route path="/jobs/:id/report" element={<SubmitReport />} />
-          </Route>
+        <Route element={<VetterStatusRoute allowPendingReview />}>
+          <Route path="/vetter/profile" element={<VetterProfilePage />} />
+        </Route>
+        <Route element={<VetterStatusRoute />}>
+          <Route path="/vetter/dashboard" element={<VetterDashboard />} />
+          <Route path="/dashboard/vetter" element={<VetterDashboard />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/earnings" element={<Earnings />} />
+          <Route path="/jobs/:id/report" element={<SubmitReport />} />
+          <Route path="/vetter/jobs" element={<VetterJobs />} />
+          <Route path="/vetter/jobs/:id/report" element={<VetterJobReport />} />
+        </Route>
         </Route>
         <Route path="/requests" element={<Requests />} />
         <Route path="/requests/new" element={<NewRequest />} />
@@ -116,6 +125,10 @@ const AuthenticatedApp = () => {
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/map" element={<VetterMap />} />
         <Route path="/vetters/:id" element={<PublicVetterProfile />} />
+        <Route path="/listings" element={<Listings />} />
+        <Route path="/listings/new" element={<NewListing />} />
+        <Route path="/listings/:id" element={<ListingDetail />} />
+        <Route path="/listings/:id/report" element={<ListingReport />} />
       </Route>
       <Route element={<RoleRoute requireAdmin />}>
         <Route element={<AdminLayout />}>
@@ -128,6 +141,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/metrics" element={<AdminMetrics />} />
           <Route path="/admin/sitemap" element={<SiteMap />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/listings" element={<AdminListings />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
