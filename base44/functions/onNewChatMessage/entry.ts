@@ -11,11 +11,8 @@ Deno.serve(async (req) => {
     }
 
     // Fetch the conversation to find recipients
-    const conversations = await base44.asServiceRole.entities.Conversation.filter({
-      id: data.conversation_id,
-    });
-
-    const convo = conversations[0];
+    const allConversations = await base44.asServiceRole.entities.Conversation.list();
+    const convo = allConversations.find(c => c.id === data.conversation_id);
     if (!convo?.participants) {
       return Response.json({ skipped: true, reason: "conversation not found" });
     }
