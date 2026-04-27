@@ -63,10 +63,7 @@ export default function RequestDetail() {
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["vetting-request", id],
-    queryFn: async () => {
-      const all = await base44.entities.VettingRequest.list();
-      return all.filter(r => r.id === id);
-    },
+    queryFn: () => base44.entities.VettingRequest.filter({ id }),
     enabled: !!id,
   });
 

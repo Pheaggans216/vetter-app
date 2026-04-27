@@ -57,10 +57,7 @@ export default function SubmitReport() {
 
   const { data: jobs = [] } = useQuery({
     queryKey: ["job-for-report", jobId],
-    queryFn: async () => {
-      const all = await base44.entities.VettingRequest.list();
-      return all.filter(r => r.id === jobId);
-    },
+    queryFn: () => base44.entities.VettingRequest.filter({ id: jobId }),
     enabled: !!jobId,
   });
   const job = jobs[0];

@@ -40,10 +40,7 @@ export default function ListingDetail() {
 
   const { data: listings = [], isLoading } = useQuery({
     queryKey: ["listing", id],
-    queryFn: async () => {
-      const all = await base44.entities.Listing.list();
-      return all.filter(l => l.id === id);
-    },
+    queryFn: () => base44.entities.Listing.filter({ id }),
     enabled: !!id,
   });
   const listing = listings[0];

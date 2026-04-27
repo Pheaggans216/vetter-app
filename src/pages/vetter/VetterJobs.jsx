@@ -170,8 +170,8 @@ export default function VetterJobs() {
             <div className="space-y-3">
               {available.map(j => (
                 <JobCard key={j.id} job={j}
-                  onAccept={j => acceptMutation.mutate(j)}
-                  onDecline={j => declineMutation.mutate(j)}
+                  onAccept={(job) => acceptMutation.mutate(job)}
+                  onDecline={(job) => declineMutation.mutate(job)}
                   actionPending={actionPending}
                 />
               ))}

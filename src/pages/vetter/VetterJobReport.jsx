@@ -59,10 +59,7 @@ export default function VetterJobReport() {
 
   const { data: jobs = [] } = useQuery({
     queryKey: ["vetter-job", jobId],
-    queryFn: async () => {
-      const all = await base44.entities.VetterJob.list();
-      return all.filter(j => j.id === jobId);
-    },
+    queryFn: () => base44.entities.VetterJob.filter({ id: jobId }),
     enabled: !!jobId,
   });
   const job = jobs[0];
@@ -91,10 +88,12 @@ export default function VetterJobReport() {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     setUploading(true);
+    const urls = [];
     for (const file of files) {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      update({ photos: [...form.photos, file_url] });
+      urls.push(file_url);
     }
+    setForm(prev => ({ ...prev, photos: [...prev.photos, ...urls] }));
     setUploading(false);
   };
 
