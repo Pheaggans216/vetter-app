@@ -44,6 +44,31 @@ Deno.serve(async (req) => {
         conversation_id: data.conversation_id,
         read: false,
       });
+
+      // Email alert
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: email,
+          subject: `New message from ${senderName}`,
+          body: `
+            <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; color: #1a2a3a;">
+              <h2 style="color: #4a7fa5;">💬 New message from ${senderName}</h2>
+              <p style="font-size: 15px; background: #f4f7fa; border-left: 4px solid #4a7fa5; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0;">
+                "${preview}"
+              </p>
+              <p style="margin-top: 24px;">
+                <a href="https://trust-vetter-check.base44.app/messages/${data.conversation_id}"
+                   style="background: #4a7fa5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+                  View Message →
+                </a>
+              </p>
+              <p style="margin-top: 32px; font-size: 12px; color: #aaa;">You're receiving this because you have an active conversation on Vetter.</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.error("Email send failed:", emailErr.message);
+      }
     }
 
     return Response.json({ success: true, notified: recipients.length });

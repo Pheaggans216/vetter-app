@@ -26,10 +26,8 @@ export default function Messages() {
   const { data: requests = [] } = useQuery({
     queryKey: ["convo-requests", requestIds.join(",")],
     queryFn: async () => {
-      const results = await Promise.all(
-        requestIds.map((id) => base44.entities.VettingRequest.filter({ id }))
-      );
-      return results.flat();
+      const all = await base44.entities.VettingRequest.list();
+      return all.filter(r => requestIds.includes(r.id));
     },
     enabled: requestIds.length > 0,
   });

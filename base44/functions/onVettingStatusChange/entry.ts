@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
 
     const label = statusLabels[newStatus] || newStatus;
 
-    // Notify the buyer
+    // Notify the buyer (in-app + email)
     await base44.asServiceRole.entities.Notification.create({
       recipient_email: data.buyer_email,
       type: "status_change",
@@ -38,6 +38,31 @@ Deno.serve(async (req) => {
       request_id: data.id,
       read: false,
     });
+
+    const appUrl = "https://trust-vetter-check.base44.app";
+    try {
+      const isCompleted = newStatus === "completed";
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: data.buyer_email,
+        subject: `${label} — "${data.title}"`,
+        body: `
+          <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; color: #1a2a3a;">
+            <h2 style="color: #4a7fa5;">${label}</h2>
+            <p>Your vetting request <strong>"${data.title}"</strong> has been updated.</p>
+            ${isCompleted ? `<p style="color: #2d8a6e; font-weight: 600;">✅ Your inspection report is ready to view!</p>` : ""}
+            <p style="margin-top: 24px;">
+              <a href="${appUrl}/requests/${data.id}"
+                 style="background: #4a7fa5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+                ${isCompleted ? "View Inspection Report →" : "View Request →"}
+              </a>
+            </p>
+            <p style="margin-top: 32px; font-size: 12px; color: #aaa;">Vetter — Trusted marketplace verification.</p>
+          </div>
+        `,
+      });
+    } catch (emailErr) {
+      console.error("Buyer email failed:", emailErr.message);
+    }
 
     // Notify vetter when a job is assigned to them
     if (data.vetter_email && newStatus === "matched") {
@@ -50,6 +75,28 @@ Deno.serve(async (req) => {
         request_id: data.id,
         read: false,
       });
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: data.vetter_email,
+          subject: `New job request: "${data.title}"`,
+          body: `
+            <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; color: #1a2a3a;">
+              <h2 style="color: #4a7fa5;">🎯 New Job Request</h2>
+              <p>You've been matched to inspect: <strong>"${data.title}"</strong></p>
+              <p>Log in to accept or decline this job from your Jobs tab.</p>
+              <p style="margin-top: 24px;">
+                <a href="${appUrl}/jobs"
+                   style="background: #4a7fa5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+                  View Job →
+                </a>
+              </p>
+              <p style="margin-top: 32px; font-size: 12px; color: #aaa;">Vetter — Trusted marketplace verification.</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.error("Vetter matched email failed:", emailErr.message);
+      }
     }
 
     // Notify vetter when a scheduled job is confirmed
@@ -63,6 +110,27 @@ Deno.serve(async (req) => {
         request_id: data.id,
         read: false,
       });
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: data.vetter_email,
+          subject: `Job scheduled: "${data.title}"`,
+          body: `
+            <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; color: #1a2a3a;">
+              <h2 style="color: #4a7fa5;">📅 Job Scheduled</h2>
+              <p>Your inspection for <strong>"${data.title}"</strong> is now confirmed and scheduled.</p>
+              <p style="margin-top: 24px;">
+                <a href="${appUrl}/jobs"
+                   style="background: #4a7fa5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+                  View Job →
+                </a>
+              </p>
+              <p style="margin-top: 32px; font-size: 12px; color: #aaa;">Vetter — Trusted marketplace verification.</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.error("Vetter scheduled email failed:", emailErr.message);
+      }
     }
 
     return Response.json({ success: true });
