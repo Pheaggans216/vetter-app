@@ -1,11 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, ShoppingBag, MapPin, Tag, ShieldCheck, AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCurrentMode } from "@/lib/roleState";
+import { useToast } from "@/components/ui/use-toast";
 
 const CATEGORY_LABELS = {
   cars_and_motorcycles: "Vehicles", electronics: "Electronics", appliances: "Appliances",
@@ -78,6 +80,39 @@ export default function Listings() {
   const { user } = useAuth();
   const mode = getCurrentMode(user);
   const isSeller = mode === "seller";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  // Handle return from Wix Payments checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get('payment');
+    const jobId = params.get('jobId');
+    if (paymentStatus === 'success' && jobId) {
+      // Mark the job as payment_secured
+      (async () => {
+        try {
+          await base44.entities.VetterJob.update(jobId, {
+            status: 'payment_secured',
+            payment_status: 'held',
+          });
+          // Also update listing vetting status
+          const jobs = await base44.entities.VetterJob.filter({ id: jobId });
+          if (jobs[0]?.listing_id) {
+            await base44.entities.Listing.update(jobs[0].listing_id, { vetting_status: 'payment_secured' });
+          }
+          queryClient.invalidateQueries({ queryKey: ['listings'] });
+          queryClient.invalidateQueries({ queryKey: ['my-listings'] });
+          toast({ title: '🎉 Payment confirmed!', description: 'A Vetter will now be matched to your request.' });
+        } catch (e) {
+          console.error('Failed to update job after payment:', e);
+        }
+        // Clean up URL params
+        navigate('/listings', { replace: true });
+      })();
+    }
+  }, []);
 
   const { data: allListings = [], isLoading } = useQuery({
     queryKey: ["listings"],

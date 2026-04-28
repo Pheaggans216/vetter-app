@@ -77,7 +77,7 @@ export default function RequestVettingFlow({ listing, onClose, onSuccess }) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      // Create the VetterJob
+      // Create the VetterJob first
       const job = await base44.entities.VetterJob.create({
         listing_id: listing.id,
         buyer_email: user.email,
@@ -102,10 +102,40 @@ export default function RequestVettingFlow({ listing, onClose, onSuccess }) {
       // Update listing status
       await base44.entities.Listing.update(listing.id, { vetting_status: "vetter_requested" });
 
-      return job;
+      // If seller pays — no checkout needed
+      if (buyerPays === 0) {
+        await base44.entities.VetterJob.update(job.id, {
+          status: "payment_secured",
+          payment_status: "held",
+        });
+        await base44.entities.Listing.update(listing.id, { vetting_status: "payment_secured" });
+        return { job, redirectUrl: null };
+      }
+
+      // Create Wix Payments checkout session
+      const selectedTierLabel = TIERS.find(t => t.id === tier)?.label || tier;
+      const res = await base44.functions.invoke('create-checkout', {
+        jobId: job.id,
+        amount: buyerPays,
+        tierLabel: selectedTierLabel,
+        buyerEmail: user?.email,
+        buyerName: user?.full_name,
+      });
+
+      if (!res.data?.redirectUrl) {
+        throw new Error(res.data?.error || 'Failed to create payment session');
+      }
+
+      return { job, redirectUrl: res.data.redirectUrl };
     },
-    onSuccess: () => {
-      setStep(4);
+    onSuccess: ({ redirectUrl }) => {
+      if (redirectUrl) {
+        // Redirect to Wix Payments hosted checkout
+        window.location.href = redirectUrl;
+      } else {
+        // Seller paid — go to confirmed screen
+        setStep(4);
+      }
     },
   });
 
