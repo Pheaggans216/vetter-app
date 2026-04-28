@@ -16,11 +16,7 @@ const STATUS_CONFIG = {
   inactive: { label: "Inactive", color: "bg-muted border-border text-muted-foreground", icon: AlertCircle },
 };
 
-const SERVICE_PRICES = {
-  standard_verification: 39,
-  specialist_vetting: 89,
-  secure_exchange_presence: 149,
-};
+const TIER_LABELS = { basic: "Basic Check", standard: "Standard Verification", expert: "Expert Verification" };
 
 export default function VetterDashboard() {
   const { user } = useAuth();
@@ -36,14 +32,16 @@ export default function VetterDashboard() {
 
   const { data: pendingJobs = [] } = useQuery({
     queryKey: ["vetter-dashboard-jobs", user?.email],
-    queryFn: () => base44.entities.VettingRequest.filter({ vetter_email: user?.email, status: "matched" }, "-created_date", 5),
+    queryFn: () => base44.entities.VetterJob.filter({ status: "payment_secured" }, "-created_date", 5),
     enabled: !!user?.email,
+    select: (data) => data.filter(j => !j.vetter_email),
   });
 
   const { data: activeJobs = [] } = useQuery({
     queryKey: ["vetter-dashboard-active", user?.email],
-    queryFn: () => base44.entities.VettingRequest.filter({ vetter_email: user?.email, status: "scheduled" }, "-created_date", 3),
+    queryFn: () => base44.entities.VetterJob.filter({ vetter_email: user?.email }, "-created_date", 5),
     enabled: !!user?.email,
+    select: (data) => data.filter(j => ["vetter_assigned", "in_progress"].includes(j.status)),
   });
 
   const availabilityMutation = useMutation({
@@ -128,7 +126,7 @@ export default function VetterDashboard() {
               Home
             </Link>
             <Link
-              to="/jobs"
+              to="/vetter/jobs"
               className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
             >
               <Briefcase className="w-4 h-4" />
@@ -226,7 +224,7 @@ export default function VetterDashboard() {
 
       {/* Shortcut grid */}
       <div className="grid grid-cols-3 gap-3 mb-5">
-        <ShortcutCard icon={Briefcase} label="Jobs" to="/jobs" badge={pendingJobs.length} />
+        <ShortcutCard icon={Briefcase} label="Jobs" to="/vetter/jobs" badge={pendingJobs.length} />
         <ShortcutCard icon={MessageCircle} label="Messages" to="/messages" />
         <ShortcutCard icon={DollarSign} label="Earnings" to="/earnings" />
       </div>
@@ -240,7 +238,7 @@ export default function VetterDashboard() {
           Home
         </Link>
         <Link
-          to="/jobs"
+          to="/vetter/jobs"
           className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border/60 bg-card text-[13px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
         >
           <Briefcase className="w-4 h-4" />
@@ -301,16 +299,16 @@ export default function VetterDashboard() {
         <>
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wide">New Requests</p>
-            <Link to="/jobs" className="text-[12px] text-primary font-semibold">View all →</Link>
+            <Link to="/vetter/jobs" className="text-[12px] text-primary font-semibold">View all →</Link>
           </div>
           <div className="space-y-2.5 mb-4">
             {pendingJobs.slice(0, 3).map(job => (
-              <Link key={job.id} to="/jobs">
+              <Link key={job.id} to="/vetter/jobs">
                 <div className="flex items-center gap-3 px-4 py-3 bg-card rounded-2xl border border-border/60 hover:bg-muted/30 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-foreground truncate">{job.title}</p>
+                    <p className="text-[13px] font-semibold text-foreground truncate">{TIER_LABELS[job.tier] || job.tier}</p>
                     <p className="text-[11px] text-muted-foreground">
-                      ~${SERVICE_PRICES[job.service_type] || 39} · {[job.location_city, job.location_state].filter(Boolean).join(", ")}
+                      ${job.vetter_payout} payout · {[job.location_city, job.location_state].filter(Boolean).join(", ")}
                     </p>
                   </div>
                   <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700">
@@ -331,11 +329,11 @@ export default function VetterDashboard() {
           </div>
           <div className="space-y-2.5">
             {activeJobs.map(job => (
-              <Link key={job.id} to={`/jobs/${job.id}/report`}>
+              <Link key={job.id} to={`/vetter/jobs/${job.id}/report`}>
                 <div className="flex items-center gap-3 px-4 py-3 bg-card rounded-2xl border border-border/60 hover:bg-muted/30 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-foreground truncate">{job.title}</p>
-                    <p className="text-[11px] text-muted-foreground capitalize">{job.service_type?.replace(/_/g, " ")}</p>
+                    <p className="text-[13px] font-semibold text-foreground truncate">{TIER_LABELS[job.tier] || job.tier}</p>
+                    <p className="text-[11px] text-muted-foreground">{[job.location_city, job.location_state].filter(Boolean).join(", ") || "Location TBD"}</p>
                   </div>
                   <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700">
                     Scheduled

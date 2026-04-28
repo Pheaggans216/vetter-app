@@ -29,7 +29,6 @@ const STATUS_LABELS = {
 
 function JobCard({ job, onAccept, onDecline, actionPending }) {
   const isPending = job.status === "payment_secured" && !job.vetter_email;
-  const isMyJob = true;
 
   return (
     <div className="p-4 bg-card rounded-2xl border border-border/60 shadow-sm">
@@ -110,15 +109,21 @@ export default function VetterJobs() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: jobs = [], isLoading } = useQuery({
+  const { data: availableJobs = [], isLoading: loadingAvailable } = useQuery({
+    queryKey: ["vetter-jobs-available"],
+    queryFn: () => base44.entities.VetterJob.filter({ status: "payment_secured" }, "-created_date", 50),
+    enabled: !!user?.email,
+    select: (data) => data.filter(j => !j.vetter_email),
+  });
+
+  const { data: myJobs = [], isLoading: loadingMine } = useQuery({
     queryKey: ["vetter-jobs-mine", user?.email],
-    queryFn: async () => {
-      const all = await base44.entities.VetterJob.list("-created_date");
-      // Show payment_secured (unassigned) jobs + jobs assigned to this vetter
-      return all.filter(j => (j.status === "payment_secured" && !j.vetter_email) || j.vetter_email === user?.email);
-    },
+    queryFn: () => base44.entities.VetterJob.filter({ vetter_email: user?.email }, "-created_date", 50),
     enabled: !!user?.email,
   });
+
+  const isLoading = loadingAvailable || loadingMine;
+  const jobs = [...availableJobs, ...myJobs];
 
   const acceptMutation = useMutation({
     mutationFn: async (job) => {
@@ -142,9 +147,9 @@ export default function VetterJobs() {
     },
   });
 
-  const available = jobs.filter(j => j.status === "payment_secured" && !j.vetter_email);
-  const active = jobs.filter(j => ["vetter_assigned", "in_progress"].includes(j.status) && j.vetter_email === user?.email);
-  const done = jobs.filter(j => ["report_ready", "completed"].includes(j.status) && j.vetter_email === user?.email);
+  const available = availableJobs;
+  const active = myJobs.filter(j => ["vetter_assigned", "in_progress"].includes(j.status));
+  const done = myJobs.filter(j => ["report_ready", "completed"].includes(j.status));
 
   const actionPending = acceptMutation.isPending || declineMutation.isPending;
 
