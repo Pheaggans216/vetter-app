@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, ShieldCheck, MessageCircle, AlertTriangle, CheckCircle2, Clock, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCurrentMode } from "@/lib/roleState";
-import RequestVettingFlow from "@/components/listings/RequestVettingFlow";
+
 
 const CATEGORY_LABELS = {
   cars_and_motorcycles: "Cars & Motorcycles", electronics: "Electronics", appliances: "Appliances",
@@ -35,7 +35,6 @@ export default function ListingDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const mode = getCurrentMode(user);
-  const [showVettingFlow, setShowVettingFlow] = useState(false);
   const [activePhoto, setActivePhoto] = useState(0);
 
   const { data: listings = [], isLoading } = useQuery({
@@ -201,9 +200,11 @@ export default function ListingDetail() {
         {isBuyer && !isSeller && (
           <div className="space-y-2">
             {!activeJob && (
-              <Button onClick={() => setShowVettingFlow(true)} size="lg" className="w-full rounded-xl h-12 text-[15px] font-semibold gap-2">
-                <ShieldCheck className="w-5 h-5" /> Get It Vetted
-              </Button>
+              <Link to={`/listings/${id}/vet`}>
+                <Button size="lg" className="w-full rounded-xl h-12 text-[15px] font-semibold gap-2">
+                  <ShieldCheck className="w-5 h-5" /> Get It Vetted
+                </Button>
+              </Link>
             )}
             <Button
               variant="outline" size="lg"
@@ -225,18 +226,7 @@ export default function ListingDetail() {
         )}
       </div>
 
-      {/* Vetting flow modal */}
-      {showVettingFlow && (
-        <RequestVettingFlow
-          listing={listing}
-          onClose={() => setShowVettingFlow(false)}
-          onSuccess={() => {
-            setShowVettingFlow(false);
-            queryClient.invalidateQueries({ queryKey: ["listing-job", id] });
-            queryClient.invalidateQueries({ queryKey: ["listing", id] });
-          }}
-        />
-      )}
+
     </div>
   );
 }
