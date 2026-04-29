@@ -259,7 +259,7 @@ export default function VetterDashboard() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link
-              to="/jobs"
+              to="/vetter/jobs"
               className="flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors"
             >
               <Briefcase className="w-4 h-4" />

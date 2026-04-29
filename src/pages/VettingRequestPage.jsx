@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -86,16 +86,16 @@ export default function VettingRequestPage() {
     queryKey: ["listing", id],
     queryFn: () => base44.entities.Listing.filter({ id }),
     enabled: !!id,
-    onSuccess: (data) => {
-      const listing = data[0];
-      if (listing) {
-        setValueTier(getValueTierFromPrice(listing.price));
-        if (listing.seller_pays_upfront) setFeeSplit("seller_pays_all");
-        else if (listing.seller_splits_cost) setFeeSplit("split_with_seller");
-      }
-    },
   });
   const listing = listings[0];
+
+  useEffect(() => {
+    if (listing) {
+      setValueTier(getValueTierFromPrice(listing.price));
+      if (listing.seller_pays_upfront) setFeeSplit("seller_pays_all");
+      else if (listing.seller_splits_cost) setFeeSplit("split_with_seller");
+    }
+  }, [listing?.id]);
 
   const selectedTier = TIERS.find(t => t.id === tier);
   const basePrice = selectedTier?.price || 89;
@@ -370,7 +370,7 @@ export default function VettingRequestPage() {
           size="lg"
           onClick={() => bookMutation.mutate()}
           disabled={bookMutation.isPending}
-          className="w-full rounded-xl h-13 text-[15px] font-semibold gap-2"
+          className="w-full rounded-xl h-12 text-[15px] font-semibold gap-2"
         >
           {bookMutation.isPending
             ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
