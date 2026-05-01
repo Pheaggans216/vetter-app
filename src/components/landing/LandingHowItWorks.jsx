@@ -1,25 +1,25 @@
-import { Search, MapPin, ShieldCheck } from "lucide-react";
+import { Link2, UserCheck, ShieldCheck } from "lucide-react";
 
 const steps = [
   {
-    icon: Search,
+    icon: Link2,
     step: "01",
-    title: "Find an item you want to buy",
-    desc: "Spot something on Facebook Marketplace, Craigslist, OfferUp, or any platform.",
+    title: "Paste any listing link",
+    desc: "Found something on Facebook Marketplace, Craigslist, eBay, or OfferUp? Just paste the link — or enter details manually.",
     color: "bg-primary/10 text-primary",
   },
   {
-    icon: MapPin,
+    icon: UserCheck,
     step: "02",
-    title: "Request a Vetter in your area",
-    desc: "Submit your request and we'll match you with a verified local expert.",
+    title: "Choose your verification level",
+    desc: "Pick Basic, Standard, or Expert based on the item's value and risk. A certified local Vetter gets matched to your request.",
     color: "bg-accent/15 text-accent",
   },
   {
     icon: ShieldCheck,
     step: "03",
-    title: "Vetter verifies before you pay",
-    desc: "Your Vetter inspects the item in person and sends you a detailed report.",
+    title: "Vetter inspects it. You decide.",
+    desc: "Your Vetter meets the seller, inspects the item in person, and sends you a full report before you pay a cent.",
     color: "bg-chart-3/15 text-chart-3",
   },
 ];
@@ -34,7 +34,7 @@ export default function LandingHowItWorks() {
             How Vetter works
           </h2>
           <p className="text-muted-foreground text-[15px] mt-3 max-w-md mx-auto">
-            Three easy steps between you and a safe, confident purchase.
+            Paste a listing from any marketplace and let a local expert verify it before you pay.
           </p>
         </div>
 

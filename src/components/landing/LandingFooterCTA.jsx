@@ -10,20 +10,20 @@ export default function LandingFooterCTA() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent)] pointer-events-none" />
           <ShieldCheck className="w-10 h-10 text-white/80 mx-auto mb-5" />
           <h2 className="font-heading font-bold text-white text-[26px] sm:text-[32px] leading-tight mb-3">
-            Don't risk it.{" "}
+            Found it online?{" "}
             <span className="text-white/90">Get it Vetted.</span>
           </h2>
           <p className="text-white/75 text-[15px] leading-relaxed mb-8 max-w-md mx-auto">
-            Stop gambling on marketplace listings. Get a local expert to verify before you send a single dollar.
+            Paste any listing link from Facebook Marketplace, Craigslist, eBay, or OfferUp. A local expert verifies it before you pay.
           </p>
           <Link
-            to="/requests/new"
+            to="/get-it-vetted"
             className="inline-flex items-center gap-2 h-13 px-8 py-3.5 rounded-xl bg-white text-primary text-[15px] font-bold hover:bg-white/90 transition-all shadow-lg hover:-translate-y-0.5"
           >
-            Request a Vetter
+            Paste Listing Link
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <p className="text-white/50 text-[12px] mt-5">Free to submit · Matched in minutes · Cancel anytime</p>
+          <p className="text-white/50 text-[12px] mt-5">Works with any marketplace · Vetters near you · Cancel anytime</p>
         </div>
 
         {/* Footer links */}

@@ -58,28 +58,30 @@ export default function BuyerDashboard() {
         </div>
       </div>
 
+      {/* Hero CTA */}
+      <Link to="/get-it-vetted" className="block mb-4">
+        <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="flex-1">
+            <p className="font-heading font-bold text-[15px]">Paste Listing Link → Get It Vetted</p>
+            <p className="text-primary-foreground/70 text-[12px]">Found something online? Verify before you pay.</p>
+          </div>
+          <ArrowRight className="w-5 h-5 opacity-70" />
+        </div>
+      </Link>
+
       {/* Quick actions */}
       <div className="space-y-2.5 mb-5">
         <Link to="/listings" className="block">
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <p className="font-heading font-bold text-[15px]">Browse & Verify Listings</p>
-              <p className="text-primary-foreground/70 text-[12px]">Don't buy blind — verify before you pay</p>
-            </div>
-            <ArrowRight className="w-5 h-5 opacity-70" />
-          </div>
-        </Link>
-        <Link to="/requests/new" className="block">
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/60">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Plus className="w-5 h-5 text-primary" />
+              <ShoppingBag className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="font-heading font-bold text-[15px] text-foreground">Submit a Vetting Request</p>
-              <p className="text-muted-foreground text-[12px]">Got a link from another marketplace?</p>
+              <p className="font-heading font-bold text-[15px] text-foreground">My Verifications</p>
+              <p className="text-muted-foreground text-[12px]">Track your active and past vetting jobs</p>
             </div>
             <ArrowRight className="w-5 h-5 text-muted-foreground opacity-70" />
           </div>

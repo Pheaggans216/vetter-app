@@ -31,47 +31,59 @@ export default function LandingHero() {
 
         {/* Headline */}
         <h1 className="font-heading font-bold text-foreground text-[38px] sm:text-[52px] leading-[1.1] tracking-tight mb-5">
-          Buy anything safely.{" "}
+          Found it online?{" "}
           <span className="text-primary">Get it Vetted</span>{" "}
-          first.
+          before you pay.
         </h1>
 
         {/* Subheadline */}
         <p className="text-muted-foreground text-[17px] sm:text-[19px] leading-relaxed mb-10 max-w-xl mx-auto">
-          Local experts verify items before you pay—no more scams, no more regrets.
+          Paste any listing link from Facebook Marketplace, Craigslist, eBay, or OfferUp. A certified local expert inspects it in person before you send a dollar.
         </p>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           {isOnboarded ? (
-            <Link
-              to={dashboardPath}
-              className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Go to My Dashboard
-            </Link>
+            <>
+              <Link
+                to="/get-it-vetted"
+                className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Get It Vetted
+              </Link>
+              <Link
+                to={dashboardPath}
+                className="inline-flex items-center gap-2 h-13 px-6 py-3.5 rounded-xl border border-border bg-card text-[15px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                My Dashboard
+              </Link>
+            </>
           ) : (
-            <Link
-              to="/requests/new"
-              className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
-            >
-              Request a Vetter
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <>
+              <Link
+                to="/get-it-vetted"
+                className="inline-flex items-center gap-2 h-13 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Paste Listing Link
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="#how-it-works"
+                className="inline-flex items-center gap-2 h-13 px-6 py-3.5 rounded-xl border border-border bg-card text-[15px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+              >
+                How it works
+                <ChevronDown className="w-4 h-4" />
+              </a>
+            </>
           )}
-          <a
-            href="#how-it-works"
-            className="inline-flex items-center gap-2 h-13 px-6 py-3.5 rounded-xl border border-border bg-card text-[15px] font-medium text-foreground hover:bg-muted/50 transition-colors"
-          >
-            How it works
-            <ChevronDown className="w-4 h-4" />
-          </a>
         </div>
 
         {/* Social proof micro-copy */}
         <p className="text-[12px] text-muted-foreground mt-6">
-          ✓ No credit card required &nbsp;&nbsp;✓ Available in your city &nbsp;&nbsp;✓ 5-star vetters
+          ✓ Works with any marketplace &nbsp;&nbsp;✓ Vetters near you &nbsp;&nbsp;✓ Money-back guarantee
         </p>
       </div>
     </section>

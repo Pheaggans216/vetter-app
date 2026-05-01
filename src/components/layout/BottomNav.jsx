@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, MapPin, ShoppingBag } from "lucide-react";
+import { Home, FileText, MessageCircle, User, Briefcase, Calendar, DollarSign, MapPin, ShieldCheck, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/AuthContext";
 
 const buyerTabs = [
   { label: "Home", icon: Home, path: "/dashboard/buyer" },
-  { label: "Listings", icon: ShoppingBag, path: "/listings" },
+  { label: "Get Vetted", icon: ShieldCheck, path: "/get-it-vetted" },
   { label: "Map", icon: MapPin, path: "/map" },
   { label: "Messages", icon: MessageCircle, path: "/messages" },
   { label: "Profile", icon: User, path: "/profile" },

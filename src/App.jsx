@@ -55,6 +55,7 @@ import VetterJobs from '@/pages/vetter/VetterJobs';
 import VetterJobReport from '@/pages/vetter/VetterJobReport';
 import AdminListings from '@/pages/admin/AdminListings';
 import VettingRequestPage from '@/pages/VettingRequestPage';
+import GetItVetted from '@/pages/GetItVetted';
 
 // "/" always shows the landing page — for everyone
 function RootRoute() {
@@ -131,6 +132,7 @@ const AuthenticatedApp = () => {
         <Route path="/listings/:id" element={<ListingDetail />} />
         <Route path="/listings/:id/report" element={<ListingReport />} />
         <Route path="/listings/:id/vet" element={<VettingRequestPage />} />
+        <Route path="/get-it-vetted" element={<GetItVetted />} />
       </Route>
       <Route element={<RoleRoute requireAdmin />}>
         <Route element={<AdminLayout />}>

@@ -53,7 +53,7 @@ export default function NewListing() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listings"] });
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
-      toast({ title: "Listing created!", description: "Your item is now live on the marketplace." });
+      toast({ title: "Item submitted!", description: "Your item has been submitted for verification." });
       navigate("/listings");
     },
   });
@@ -96,8 +96,8 @@ export default function NewListing() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-[17px] font-heading font-bold text-foreground">List an Item</h1>
-          <p className="text-[12px] text-muted-foreground">Get it verified. Sell with confidence.</p>
+          <h1 className="text-[17px] font-heading font-bold text-foreground">Add Item for Verification</h1>
+          <p className="text-[12px] text-muted-foreground">Submit an item to be vetted before you pay.</p>
         </div>
       </div>
 

@@ -132,26 +132,33 @@ export default function Listings() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-heading font-bold text-foreground">
-            {isSeller ? "My Listings" : "Browse Listings"}
+            {isSeller ? "My Items" : "My Verifications"}
           </h1>
           <p className="text-[12px] text-muted-foreground mt-0.5">
-            {isSeller ? "Manage your items for sale" : "Verify before you pay."}
+            {isSeller ? "Items submitted for verification" : "Items you've requested to be vetted."}
           </p>
         </div>
         {isSeller && (
           <Link to="/listings/new">
             <Button size="sm" className="rounded-xl h-9 gap-1.5 text-[13px] font-semibold">
-              <Plus className="w-4 h-4" /> List Item
+              <Plus className="w-4 h-4" /> Add Item
             </Button>
           </Link>
         )}
       </div>
 
-      {/* Trust banner for buyers */}
+      {/* Buyer prompt to start new verification */}
       {!isSeller && (
-        <div className="mb-5 p-3.5 rounded-2xl bg-primary/5 border border-primary/15">
-          <p className="text-[13px] font-semibold text-primary mb-0.5">Don't buy blind. 🛡</p>
-          <p className="text-[12px] text-muted-foreground">Every listing can be verified by a certified Vetter before you pay.</p>
+        <div className="mb-5 p-3.5 rounded-2xl bg-primary/5 border border-primary/15 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[13px] font-semibold text-primary mb-0.5">Verify a new item 🛡</p>
+            <p className="text-[12px] text-muted-foreground">Paste any marketplace link and get it vetted before you pay.</p>
+          </div>
+          <Link to="/get-it-vetted" className="shrink-0">
+            <Button size="sm" className="rounded-xl h-9 gap-1.5 text-[12px] font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5" /> Get It Vetted
+            </Button>
+          </Link>
         </div>
       )}
 
@@ -165,14 +172,18 @@ export default function Listings() {
             <ShoppingBag className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="font-heading font-semibold text-foreground mb-1">
-            {isSeller ? "No listings yet" : "No listings available"}
+            {isSeller ? "No items yet" : "No verifications yet"}
           </p>
           <p className="text-muted-foreground text-sm mb-5 max-w-[240px]">
-            {isSeller ? "List your first item and get it verified to boost buyer trust." : "Check back soon — more listings are being added."}
+            {isSeller ? "Submit your first item to be verified." : "Paste a listing link to get your first item vetted."}
           </p>
-          {isSeller && (
+          {isSeller ? (
             <Link to="/listings/new">
-              <Button className="rounded-xl">List an Item</Button>
+              <Button className="rounded-xl">Add an Item</Button>
+            </Link>
+          ) : (
+            <Link to="/get-it-vetted">
+              <Button className="rounded-xl gap-1.5"><ShieldCheck className="w-4 h-4" /> Get It Vetted</Button>
             </Link>
           )}
         </div>
