@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import StepSpecialties from "@/components/vetter-onboarding/StepSpecialties";
 import StepDocuments from "@/components/vetter-onboarding/StepDocuments";
@@ -15,7 +16,7 @@ import StepReview from "@/components/vetter-onboarding/StepReview";
 const BASE_STEPS = ["Roles", "Specialties", "Documents", "Experience", "Location", "Availability", "Review"];
 
 export default function VetterOnboarding() {
-  const { user, refreshUser } = useAuth();
+  const { user, isLoadingAuth, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -46,7 +47,13 @@ export default function VetterOnboarding() {
 
   // Guard: redirect if profile already exists
   useEffect(() => {
-    if (!user?.email) return;
+    // Wait for auth to finish loading
+    if (isLoadingAuth) return;
+    // If not logged in, stop spinning
+    if (!user?.email) {
+      setChecking(false);
+      return;
+    }
     base44.entities.VetterProfile.filter({ user_email: user.email })
       .then((existing) => {
         if (existing.length > 0) {
@@ -56,7 +63,7 @@ export default function VetterOnboarding() {
         }
       })
       .catch(() => setChecking(false));
-  }, [user?.email]);
+  }, [user?.email, isLoadingAuth]);
 
   const update = (fields) => setProfile((prev) => ({ ...prev, ...fields }));
 
@@ -93,10 +100,22 @@ export default function VetterOnboarding() {
     }
   };
 
-  if (checking) {
+  if (checking || isLoadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-5">
+        <p className="text-foreground font-heading font-bold text-lg">Sign in to become a Vetter</p>
+        <p className="text-muted-foreground text-sm text-center max-w-xs">You need to be logged in to apply as a Vetter.</p>
+        <Button onClick={() => base44.auth.redirectToLogin(window.location.href)} className="rounded-xl px-8">
+          Sign In
+        </Button>
       </div>
     );
   }
