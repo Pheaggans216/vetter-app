@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell, MessageCircle, ShieldCheck } from "lucide-react";
+import { Bell } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
