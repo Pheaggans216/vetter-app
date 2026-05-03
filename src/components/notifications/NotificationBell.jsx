@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell } from "lucide-react";
+import { Bell, MessageCircle, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function NotificationBell() {
   const { user } = useAuth();
@@ -26,15 +27,33 @@ export default function NotificationBell() {
     refetchInterval: 30000,
   });
 
-  // Real-time subscription
+  // Real-time subscription + toast alerts
   useEffect(() => {
     if (!user?.email) return;
     const unsub = base44.entities.Notification.subscribe((event) => {
-      if (
-        event.type === "create" &&
-        event.data?.recipient_email === user.email
-      ) {
+      if (event.type === "create" && event.data?.recipient_email === user.email) {
         queryClient.invalidateQueries({ queryKey: ["notifications", user.email] });
+
+        const n = event.data;
+        const isMessage = n.type === "new_message";
+        const emoji = isMessage ? "💬" : "🔔";
+
+        toast(
+          <div className="flex items-start gap-2.5">
+            <span className="text-[16px] shrink-0 mt-0.5">{emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-foreground leading-snug">{n.title}</p>
+              {n.body && <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2">{n.body}</p>}
+            </div>
+          </div>,
+          {
+            duration: 5000,
+            action: n.link ? {
+              label: "View",
+              onClick: () => navigate(n.link),
+            } : undefined,
+          }
+        );
       }
     });
     return unsub;

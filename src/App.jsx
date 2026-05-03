@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
+import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import { useState } from "react";
 import SplashScreen from "@/components/SplashScreen";
 import { navLogoRef } from "@/lib/navLogoRef";
@@ -174,6 +175,7 @@ function App() {
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <SonnerToaster position="top-center" richColors />
       </QueryClientProvider>
     </AuthProvider>
   );
