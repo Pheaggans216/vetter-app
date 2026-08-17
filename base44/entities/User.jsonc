@@ -50,5 +50,11 @@
     "avatar_url": {
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "app_role",
+    "app_roles",
+    "active_mode",
+    "avatar_url"
+  ]
 }
