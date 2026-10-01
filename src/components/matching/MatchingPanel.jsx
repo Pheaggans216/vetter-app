@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VetterMatchCard from "./VetterMatchCard";
 import { Sparkles, Search, CheckCircle2, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { hideSampleVetters } from "@/lib/vetterFilters";
 
 // Category → specialty mapping
 const CATEGORY_SPECIALTY_MAP = {
@@ -39,7 +40,10 @@ export default function MatchingPanel({ request, onMatched }) {
 
   const { data: allVetters = [], isLoading } = useQuery({
     queryKey: ["vetters-active"],
-    queryFn: () => base44.entities.VetterProfile.filter({ status: "active", available: true }),
+    queryFn: async () => {
+      const list = await base44.entities.VetterProfile.filter({ status: "active", available: true });
+      return hideSampleVetters(list);
+    },
   });
 
   // Filter by service type and specialty

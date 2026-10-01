@@ -15,6 +15,7 @@ import VetterDetailPanel from "@/components/map/VetterDetailPanel";
 import VetterListCard from "@/components/map/VetterListCard";
 import MapFilters from "@/components/map/MapFilters";
 import { geocodeLocation, cityFallback, distanceMiles, stableJitter } from "@/lib/geocode";
+import { hideSampleVetters } from "@/lib/vetterFilters";
 
 // ── Leaflet icon fix (no default icon 404) ──────────────────────────────────
 delete L.Icon.Default.prototype._getIconUrl;
@@ -38,15 +39,6 @@ function FlyTo({ center, zoom = 12 }) {
 const MILES_TO_KM = 1.60934;
 const DEFAULT_CENTER = [39.5, -98.35];
 const DEFAULT_ZOOM = 4;
-
-// Demo vetters shown when no real data exists yet
-const DEMO_VETTERS = [
-  { id: "d1", display_name: "Marcus T.", available: true, rating: 4.9, total_inspections: 87, total_reviews: 72, avg_response_time: "< 1 hr", specialties: ["mechanic"], service_types: ["standard_verification","specialist_vetting"], secure_exchange_approved: true, certified_specialist: true, city: "Los Angeles", state: "CA", _demo: true },
-  { id: "d2", display_name: "Sarah K.", available: true, rating: 4.7, total_inspections: 52, total_reviews: 44, avg_response_time: "< 2 hrs", specialties: ["electronics_technician"], service_types: ["standard_verification"], certified_specialist: false, city: "Austin", state: "TX", _demo: true },
-  { id: "d3", display_name: "James R.", available: false, rating: 4.5, total_inspections: 31, total_reviews: 28, avg_response_time: "< 3 hrs", specialties: ["jeweler"], service_types: ["specialist_vetting"], certified_specialist: true, city: "New York", state: "NY", _demo: true },
-  { id: "d4", display_name: "Priya M.", available: true, rating: 4.8, total_inspections: 64, total_reviews: 59, avg_response_time: "< 1 hr", specialties: ["luxury_authenticator"], service_types: ["standard_verification","secure_exchange_presence"], secure_exchange_approved: true, city: "Chicago", state: "IL", _demo: true },
-  { id: "d5", display_name: "Derek W.", available: true, rating: 4.3, total_inspections: 19, total_reviews: 15, avg_response_time: "Same day", specialties: ["appliance_expert"], service_types: ["standard_verification"], city: "Phoenix", state: "AZ", _demo: true },
-];
 
 export default function VetterMap() {
   const navigate = useNavigate();
@@ -83,22 +75,14 @@ export default function VetterMap() {
     queryFn: () => base44.entities.VetterProfile.filter({ status: "active" }),
   });
 
-  // Only use real vetters — no demo fallback per requirements
-  const allVetters = rawVetters;
+  // Only real, approved Vetters are shown — sample/seed profiles are hidden.
+  const allVetters = hideSampleVetters(rawVetters);
 
   // Geocode vetters (city/state) once loaded — cache per vetter id
   useEffect(() => {
     if (!allVetters.length) return;
     allVetters.forEach(async (v) => {
       if (vetterCoords[v.id]) return;
-      if (v._demo) {
-        const coord = cityFallback(v.city);
-        if (coord) {
-          const jittered = stableJitter(coord.lat, coord.lng, v.id);
-          setVetterCoords(prev => ({ ...prev, [v.id]: jittered }));
-        }
-        return;
-      }
       let coord = cityFallback(v.city);
       if (!coord && (v.city || v.state || v.zip_code)) {
         coord = await geocodeLocation(v.city, v.state, v.zip_code);

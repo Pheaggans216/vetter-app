@@ -8,6 +8,7 @@ import {
   Briefcase, Award, Wrench, CalendarCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isSampleVetter } from "@/lib/vetterFilters";
 
 const specialtyLabels = {
   mechanic: "Mechanic",
@@ -47,7 +48,7 @@ export default function PublicVetterProfile() {
     queryKey: ["public-vetter-profile", vetterId],
     queryFn: async () => {
       const all = await base44.entities.VetterProfile.list();
-      return all.filter(p => p.id === vetterId);
+      return all.filter(p => p.id === vetterId && !isSampleVetter(p));
     },
     enabled: !!vetterId,
   });
