@@ -8,6 +8,7 @@ import { Plus, ShoppingBag, MapPin, Tag, ShieldCheck, AlertTriangle, Clock, Chec
 import { cn } from "@/lib/utils";
 import { getCurrentMode } from "@/lib/roleState";
 import { useToast } from "@/components/ui/use-toast";
+import { categoryLabel } from "@/lib/vetterCategories";
 
 const CATEGORY_LABELS = {
   cars_and_motorcycles: "Vehicles", electronics: "Electronics", appliances: "Appliances",
@@ -49,7 +50,7 @@ function ListingCard({ listing, isMine }) {
             <h3 className="font-heading font-semibold text-foreground text-[14px] leading-tight truncate">{listing.title}</h3>
             <span className="text-[15px] font-bold text-accent shrink-0">${listing.price?.toLocaleString()}</span>
           </div>
-          <p className="text-[11px] text-muted-foreground mb-2">{CATEGORY_LABELS[listing.category] || listing.category}</p>
+          <p className="text-[11px] text-muted-foreground mb-2">{CATEGORY_LABELS[listing.category] || categoryLabel(listing.category)}</p>
           {(listing.location_city || listing.location_state) && (
             <p className="text-[11px] text-muted-foreground flex items-center gap-1 mb-2">
               <MapPin className="w-3 h-3" />

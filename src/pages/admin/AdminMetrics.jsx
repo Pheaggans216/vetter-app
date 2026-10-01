@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
 import { format, subDays, parseISO, startOfDay } from "date-fns";
+import { categoryLabel } from "@/lib/vetterCategories";
 
 const SERVICE_PRICES = { standard_verification: 39, specialist_vetting: 89, secure_exchange_presence: 149 };
 
@@ -57,6 +58,8 @@ export default function AdminMetrics() {
         <h1 className="text-[22px] font-heading font-bold text-foreground">Platform Metrics</h1>
         <p className="text-muted-foreground text-[13px] mt-0.5">14-day performance overview.</p>
       </div>
+
+      <InspectionInsights />
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -136,6 +139,85 @@ export default function AdminMetrics() {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+const PAID_STATUSES = ["payment_secured", "matching", "vetter_assigned", "in_progress", "report_ready", "completed"];
+
+function InspectionInsights() {
+  const { data: jobs = [] } = useQuery({ queryKey: ["admin-insights-jobs"], queryFn: () => base44.entities.VetterJob.list("-created_date", 1000) });
+  const { data: reports = [] } = useQuery({ queryKey: ["admin-insights-reports"], queryFn: () => base44.entities.Report.list("-created_date", 1000) });
+
+  const paidJobs = jobs.filter(j => PAID_STATUSES.includes(j.status) || j.payment_status === "held" || j.payment_status === "released");
+  const grossBookings = paidJobs.reduce((s, j) => s + (j.total_price || 0), 0);
+  const platformRevenue = paidJobs.reduce((s, j) => s + (j.platform_fee || 0), 0);
+  const unpaidJobs = jobs.filter(j => j.status === "pending_payment").length;
+
+  const verdicts = { buy: 0, negotiate: 0, pass: 0 };
+  reports.forEach(r => { if (verdicts[r.recommendation] !== undefined) verdicts[r.recommendation]++; });
+  const stolenFlags = reports.filter(r => r.stolen_check === "flagged").length;
+
+  const priced = reports.filter(r => r.estimated_value && r.listed_price);
+  const avgGap = priced.length
+    ? Math.round(priced.reduce((s, r) => s + (r.listed_price - r.estimated_value) / r.listed_price, 0) / priced.length * 100)
+    : null;
+
+  const byCategory = {};
+  reports.forEach(r => {
+    const k = r.category || "other";
+    byCategory[k] = byCategory[k] || { name: categoryLabel(k), inspections: 0, failed: 0 };
+    byCategory[k].inspections++;
+    if (r.recommendation === "pass") byCategory[k].failed++;
+  });
+  const categoryRows = Object.values(byCategory).sort((a, b) => b.inspections - a.inspections).slice(0, 8);
+
+  const tiles = [
+    { label: "Paid inspections", value: paidJobs.length },
+    { label: "Gross bookings", value: `$${grossBookings.toLocaleString()}` },
+    { label: "Vetter revenue (20%)", value: `$${platformRevenue.toLocaleString()}` },
+    { label: "Started, not paid", value: unpaidJobs },
+    { label: "Reports filed", value: reports.length },
+    { label: "Do-not-buy verdicts", value: verdicts.pass },
+    { label: "Stolen-check flags", value: stolenFlags },
+    { label: "Avg. listed above estimate", value: avgGap === null ? "—" : `${avgGap}%` },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <p className="font-heading font-semibold text-foreground text-[15px]">Inspections & Revenue (all time)</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {tiles.map(t => (
+          <div key={t.label} className="bg-card rounded-2xl border border-border/60 p-4">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{t.label}</p>
+            <p className="text-[20px] font-heading font-bold text-foreground mt-1">{t.value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="bg-card rounded-2xl border border-border/60 p-5">
+        <p className="font-heading font-semibold text-foreground text-[14px] mb-3">Inspections by category</p>
+        {categoryRows.length === 0 ? (
+          <p className="text-muted-foreground text-[13px]">No reports yet. Categories appear here as Vetters file reports.</p>
+        ) : (
+          <table className="w-full text-[13px]">
+            <thead>
+              <tr className="text-muted-foreground text-left">
+                <th className="font-medium pb-2">Category</th>
+                <th className="font-medium pb-2 text-right">Inspections</th>
+                <th className="font-medium pb-2 text-right">Do not buy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categoryRows.map(r => (
+                <tr key={r.name} className="border-t border-border/40">
+                  <td className="py-2 text-foreground">{r.name}</td>
+                  <td className="py-2 text-right tabular-nums">{r.inspections}</td>
+                  <td className="py-2 text-right tabular-nums">{r.failed}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

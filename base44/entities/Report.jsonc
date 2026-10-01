@@ -72,6 +72,35 @@
     },
     "estimated_value": {
       "type": "number"
+    },
+    "serial_number": {
+      "type": "string",
+      "description": "VIN, HIN, serial, IMEI or ticket ID recorded on site"
+    },
+    "stolen_check": {
+      "type": "string",
+      "enum": [
+        "not_checked",
+        "clear",
+        "flagged"
+      ],
+      "default": "not_checked"
+    },
+    "listed_price": {
+      "type": "number"
+    },
+    "inspected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inspection_lat": {
+      "type": "number"
+    },
+    "inspection_lng": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string"
     }
   },
   "required": [

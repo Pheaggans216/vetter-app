@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Link2, ShieldCheck, Check, Loader2, Lock, Zap, Upload, X, Star, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { CATEGORY_GROUPS } from "@/lib/vetterCategories";
 
 const PLATFORMS = [
   { value: "facebook_marketplace", label: "Facebook Marketplace" },
@@ -20,17 +21,6 @@ const PLATFORMS = [
   { value: "other", label: "Other Marketplace" },
 ];
 
-const CATEGORIES = [
-  { value: "cars_and_motorcycles", label: "Cars & Motorcycles" },
-  { value: "electronics", label: "Electronics" },
-  { value: "appliances", label: "Appliances" },
-  { value: "jewelry_and_watches", label: "Jewelry & Watches" },
-  { value: "luxury_fashion_and_handbags", label: "Luxury Fashion" },
-  { value: "furniture", label: "Furniture" },
-  { value: "tools_and_equipment", label: "Tools & Equipment" },
-  { value: "rental_or_property_verification", label: "Property Verification" },
-  { value: "other", label: "Other" },
-];
 
 const TIERS = [
   {
@@ -170,7 +160,12 @@ function StepItemDetails({ form, update, uploading, onPhotoUpload, onRemovePhoto
               <Select value={form.category} onValueChange={v => update({ category: v })}>
                 <SelectTrigger className="rounded-xl h-9 text-[12px]"><SelectValue placeholder="Select" /></SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                  {CATEGORY_GROUPS.map(g => (
+                    <SelectGroup key={g.group}>
+                      <SelectLabel className="text-[11px] text-muted-foreground">{g.group}</SelectLabel>
+                      {g.items.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                    </SelectGroup>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -204,6 +199,18 @@ function StepItemDetails({ form, update, uploading, onPhotoUpload, onRemovePhoto
             <Label className="text-[12px] mb-1.5 block">Seller Name (optional)</Label>
             <Input value={form.seller_name} onChange={e => update({ seller_name: e.target.value })} placeholder="Seller's name from the listing" className="rounded-xl" />
           </div>
+          <button type="button" onClick={() => update({ buyer_is_remote: !form.buyer_is_remote })}
+            className={cn("w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all",
+              form.buyer_is_remote ? "border-primary bg-primary/5" : "border-border/60 bg-card")}>
+            <div className={cn("w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center shrink-0",
+              form.buyer_is_remote ? "border-primary bg-primary" : "border-border")}>
+              {form.buyer_is_remote && <Check className="w-3.5 h-3.5 text-white" />}
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">I'm buying from out of town</p>
+              <p className="text-[11px] text-muted-foreground">Your Vetter will be your eyes on site, with photos, video and an optional live video call.</p>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -359,12 +366,15 @@ export default function GetItVetted() {
     seller_name: "",
     uploaded_screenshots: [],
     notes: "",
+    buyer_is_remote: false,
   });
   const update = (patch) => setForm(prev => ({ ...prev, ...patch }));
 
   const [tier, setTier] = useState("standard");
   const [isRush, setIsRush] = useState(false);
   const [valueTier, setValueTier] = useState("under_1k");
+  // Reuse the records from a failed checkout attempt instead of creating duplicates
+  const [pendingBooking, setPendingBooking] = useState(null);
 
   const selectedTier = TIERS.find(t => t.id === tier);
   const basePrice = selectedTier?.price || 89;
@@ -433,8 +443,12 @@ export default function GetItVetted() {
         return;
       }
 
+      let listing = pendingBooking?.listing;
+      let job = pendingBooking?.job;
+
+      if (!listing) {
       // Create a Listing record to represent this external item
-      const listing = await base44.entities.Listing.create({
+      listing = await base44.entities.Listing.create({
         title: form.title,
         category: form.category || "other",
         price: Number(form.listing_price) || 0,
@@ -444,11 +458,14 @@ export default function GetItVetted() {
         location_state: form.location_state,
         seller_email: form.seller_name ? `seller-${Date.now()}@external.vetter` : `unknown-${Date.now()}@external.vetter`,
         vetting_status: "vetter_requested",
+        buyer_is_remote: !!form.buyer_is_remote,
         active: true,
       });
+      }
 
+      if (!job) {
       // Create VetterJob
-      const job = await base44.entities.VetterJob.create({
+      job = await base44.entities.VetterJob.create({
         listing_id: listing.id,
         buyer_email: user.email,
         seller_email: listing.seller_email,
@@ -468,6 +485,8 @@ export default function GetItVetted() {
         status: "pending_payment",
         payment_status: "unpaid",
       });
+      }
+      setPendingBooking({ listing, job });
 
       const res = await base44.functions.invoke("create-checkout", {
         jobId: job.id,
@@ -487,6 +506,13 @@ export default function GetItVetted() {
       if (result?.redirectUrl) {
         window.location.href = result.redirectUrl;
       }
+    },
+    onError: () => {
+      toast({
+        title: "We couldn't open checkout",
+        description: "No payment was taken. Please try again in a moment.",
+        variant: "destructive",
+      });
     },
   });
 

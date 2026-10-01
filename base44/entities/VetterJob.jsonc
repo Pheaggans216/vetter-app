@@ -130,6 +130,10 @@
     },
     "vetter_rating_seller": {
       "type": "number"
+    },
+    "live_video_url": {
+      "type": "string",
+      "description": "FaceTime/Zoom/Meet link the Vetter shares so the buyer can watch live"
     }
   },
   "required": [

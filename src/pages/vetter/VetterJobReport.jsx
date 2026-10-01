@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Upload, X, Loader2, Send, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Upload, X, Loader2, Send, CheckCircle2, AlertTriangle, Video, MapPin, ExternalLink } from "lucide-react";
+import { getCategoryChecklist, categoryLabel, ID_CHECKS } from "@/lib/vetterCategories";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -64,7 +65,29 @@ export default function VetterJobReport() {
   });
   const job = jobs[0];
 
-  const checklist = job ? (TIER_CHECKLIST[job.tier] || TIER_CHECKLIST.basic) : [];
+  const { data: listings = [] } = useQuery({
+    queryKey: ["vetter-job-listing", job?.listing_id],
+    queryFn: () => base44.entities.Listing.filter({ id: job.listing_id }),
+    enabled: !!job?.listing_id,
+  });
+  const listing = listings[0];
+  const categoryInfo = getCategoryChecklist(listing?.category);
+  const idCheck = ID_CHECKS[categoryInfo.idCheck];
+
+  const tierChecklist = job ? (TIER_CHECKLIST[job.tier] || TIER_CHECKLIST.basic) : [];
+  const categorySteps = categoryInfo.steps.map((label, i) => ({ id: `cat_${i}`, label }));
+  const checklist = [...tierChecklist, ...categorySteps];
+
+  const [liveUrl, setLiveUrl] = useState("");
+  const [liveSaved, setLiveSaved] = useState(false);
+  const saveLiveMutation = useMutation({
+    mutationFn: () => base44.entities.VetterJob.update(job.id, { live_video_url: liveUrl.trim() }),
+    onSuccess: () => {
+      setLiveSaved(true);
+      toast({ title: "Live link shared", description: "The buyer can now tap to watch your inspection." });
+    },
+    onError: () => toast({ title: "Couldn't save the link", description: "Please try again.", variant: "destructive" }),
+  });
 
   const [form, setForm] = useState({
     overall_condition: "",
@@ -74,8 +97,13 @@ export default function VetterJobReport() {
     red_flags: "",
     recommendation: "",
     estimated_value: "",
+    serial_number: "",
+    stolen_check: "not_checked",
     photos: [],
     checked_ids: [],
+    inspected_at: null,
+    inspection_lat: null,
+    inspection_lng: null,
   });
 
   const update = (patch) => setForm(prev => ({ ...prev, ...patch }));
@@ -88,6 +116,17 @@ export default function VetterJobReport() {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     setUploading(true);
+    // Stamp when and where the inspection evidence was captured
+    if (!form.inspected_at) {
+      update({ inspected_at: new Date().toISOString() });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => update({ inspection_lat: pos.coords.latitude, inspection_lng: pos.coords.longitude }),
+          () => {},
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      }
+    }
     const urls = [];
     for (const file of files) {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -123,6 +162,13 @@ export default function VetterJobReport() {
         checklist_items: checklistItems,
         issues_found: redFlagList,
         estimated_value: form.estimated_value ? Number(form.estimated_value) : undefined,
+        listed_price: listing?.price || undefined,
+        category: listing?.category || undefined,
+        serial_number: form.serial_number.trim() || undefined,
+        stolen_check: form.stolen_check,
+        inspected_at: form.inspected_at || new Date().toISOString(),
+        inspection_lat: form.inspection_lat ?? undefined,
+        inspection_lng: form.inspection_lng ?? undefined,
       });
 
       await base44.entities.VetterJob.update(job.id, { status: "report_ready", report_id: report.id });
@@ -132,6 +178,9 @@ export default function VetterJobReport() {
       queryClient.invalidateQueries({ queryKey: ["vetter-jobs-mine"] });
       toast({ title: "Report submitted!", description: "The buyer has been notified." });
       navigate("/vetter/jobs");
+    },
+    onError: () => {
+      toast({ title: "Report not submitted", description: "Something went wrong. Your entries are still here. Please try again.", variant: "destructive" });
     },
   });
 
@@ -151,11 +200,30 @@ export default function VetterJobReport() {
         </Link>
         <div>
           <h1 className="text-[17px] font-heading font-bold text-foreground">Inspection Report</h1>
-          <p className="text-[12px] text-muted-foreground capitalize">{job.tier} Verification</p>
+          <p className="text-[12px] text-muted-foreground capitalize">{job.tier} Verification{listing?.category ? ` · ${categoryLabel(listing.category)}` : ""}</p>
         </div>
       </div>
 
       <div className="space-y-6">
+        {/* Vetter Live */}
+        <div className="p-4 rounded-2xl border border-primary/30 bg-primary/5">
+          <div className="flex items-center gap-2 mb-1">
+            <Video className="w-4 h-4 text-primary" />
+            <p className="text-[14px] font-heading font-bold text-foreground">Vetter Live (optional)</p>
+          </div>
+          <p className="text-[12px] text-muted-foreground mb-3">
+            {listing?.buyer_is_remote ? "This buyer is out of town. " : ""}Paste a FaceTime, Zoom or Google Meet link so the buyer can watch the inspection live.
+          </p>
+          <div className="flex gap-2">
+            <Input value={liveUrl || job.live_video_url || ""} onChange={e => { setLiveUrl(e.target.value); setLiveSaved(false); }}
+              placeholder="https://..." className="rounded-xl h-10" />
+            <Button onClick={() => saveLiveMutation.mutate()} disabled={!liveUrl.trim() || saveLiveMutation.isPending || liveSaved}
+              className="rounded-xl h-10 shrink-0">
+              {saveLiveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : liveSaved ? "Shared" : "Share"}
+            </Button>
+          </div>
+        </div>
+
         {/* Checklist */}
         <Sec title="Inspection Checklist" index={1}>
           <div className="space-y-2">
@@ -239,19 +307,54 @@ export default function VetterJobReport() {
             placeholder="Additional observations, specialist notes, market context..." className="rounded-xl min-h-[70px]" />
         </Sec>
 
-        {/* Estimated value (expert only) */}
-        {job.tier === "expert" && (
-          <Sec title="Estimated Market Value" index={8} optional>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-              <Input type="number" value={form.estimated_value} onChange={e => update({ estimated_value: e.target.value })}
-                placeholder="0" className="rounded-xl h-11 pl-7" />
+        {/* ID number + stolen check */}
+        {idCheck && (
+          <Sec title={`${idCheck.label} & Stolen Check`} index={8} optional={job.tier === "basic"}>
+            <Input value={form.serial_number} onChange={e => update({ serial_number: e.target.value })}
+              placeholder={`Enter ${idCheck.label}`} className="rounded-xl h-11 mb-2" />
+            <p className="text-[11px] text-muted-foreground mb-2">
+              {idCheck.help}{" "}
+              {idCheck.url && (
+                <a href={idCheck.url} target="_blank" rel="noopener noreferrer" className="text-primary inline-flex items-center gap-0.5">
+                  Open lookup <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[{ v: "clear", l: "Clear" }, { v: "flagged", l: "Flagged" }, { v: "not_checked", l: "Not checked" }].map(o => (
+                <button key={o.v} onClick={() => update({ stolen_check: o.v })}
+                  className={cn("p-2.5 rounded-xl border-2 text-[12px] font-medium transition-all",
+                    form.stolen_check === o.v
+                      ? (o.v === "flagged" ? "border-destructive bg-destructive/5 text-destructive" : "border-primary bg-primary/5 text-primary")
+                      : "border-border/60 bg-card text-muted-foreground")}>
+                  {o.l}
+                </button>
+              ))}
             </div>
           </Sec>
         )}
 
+        {/* Estimated value (all tiers) */}
+        <Sec title="Your Estimated Value" index={idCheck ? 9 : 8} optional={job.tier !== "expert"}>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+            <Input type="number" value={form.estimated_value} onChange={e => update({ estimated_value: e.target.value })}
+              placeholder="0" className="rounded-xl h-11 pl-7" />
+          </div>
+          {listing?.price ? (
+            <p className="text-[11px] text-muted-foreground mt-1.5">Listed at ${Number(listing.price).toLocaleString()}. What is it really worth in this condition?</p>
+          ) : null}
+        </Sec>
+
+        {form.inspected_at && (
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5" />
+            Evidence stamped {new Date(form.inspected_at).toLocaleString()}{form.inspection_lat ? " with location" : ""}
+          </div>
+        )}
+
         {/* Recommendation */}
-        <Sec title="Vetter Recommendation" index={job.tier === "expert" ? 9 : 8}>
+        <Sec title="Vetter Recommendation" index={idCheck ? 10 : 9}>
           <div className="space-y-2">
             {RECOMMENDATIONS.map(rec => (
               <button key={rec.value} onClick={() => update({ recommendation: rec.value })}

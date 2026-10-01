@@ -6,8 +6,9 @@ import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, CheckCircle2, XCircle, AlertTriangle, ShieldCheck,
-  Camera, FileText, Star, MessageCircle, Flag, ThumbsUp
+  Camera, FileText, Star, MessageCircle, Flag, ThumbsUp, MapPin, Hash, Share2
 } from "lucide-react";
+import { useToast as useShareToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -133,6 +134,7 @@ export default function ListingReport() {
             <p className="text-[11px] font-semibold text-primary uppercase tracking-wide">Verified Inspection Report</p>
           </div>
         </div>
+        <ShareReportButton />
       </div>
 
       <div className="space-y-4">
@@ -176,13 +178,40 @@ export default function ListingReport() {
             <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">Condition</p>
             <p className="text-[13px] font-semibold text-foreground capitalize">{report.overall_condition}</p>
           </div>
-          {report.estimated_value && (
+          {report.estimated_value ? (
             <div className="p-3.5 bg-card rounded-2xl border border-border/60">
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">Est. Market Value</p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">Vetter's Value Estimate</p>
               <p className="text-[13px] font-semibold text-foreground">${report.estimated_value.toLocaleString()}</p>
+              {report.listed_price ? (
+                <p className={cn("text-[11px] mt-0.5", report.estimated_value < report.listed_price ? "text-amber-600" : "text-accent")}>
+                  Listed at ${report.listed_price.toLocaleString()}
+                  {report.estimated_value < report.listed_price
+                    ? ` · ${Math.round((1 - report.estimated_value / report.listed_price) * 100)}% above estimate`
+                    : " · at or below estimate"}
+                </p>
+              ) : null}
             </div>
-          )}
+          ) : null}
+          {report.serial_number || (report.stolen_check && report.stolen_check !== "not_checked") ? (
+            <div className="p-3.5 bg-card rounded-2xl border border-border/60">
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">ID & Stolen Check</p>
+              {report.serial_number && (
+                <p className="text-[12px] text-foreground flex items-center gap-1 break-all"><Hash className="w-3 h-3 shrink-0" />{report.serial_number}</p>
+              )}
+              <p className={cn("text-[13px] font-semibold", report.stolen_check === "flagged" ? "text-destructive" : report.stolen_check === "clear" ? "text-accent" : "text-muted-foreground")}>
+                {report.stolen_check === "flagged" ? "Flagged, do not buy" : report.stolen_check === "clear" ? "No records found" : "Not checked"}
+              </p>
+            </div>
+          ) : null}
         </div>
+
+        {report.inspected_at && (
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5" />
+            Inspected in person {format(new Date(report.inspected_at), "MMM d, yyyy 'at' h:mm a")}
+            {report.inspection_lat ? " · location recorded" : ""}
+          </div>
+        )}
 
         {/* Summary */}
         <RS title="Condition Summary" icon={FileText}>
@@ -303,5 +332,24 @@ function RS({ title, icon: Icon, accent, children }) {
       </div>
       {children}
     </div>
+  );
+}
+function ShareReportButton() {
+  const { toast } = useShareToast();
+  const share = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Vetter Inspection Report", url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Anyone you share it with will need to sign in to Vetter to view it." });
+    } catch (e) { /* user cancelled share */ }
+  };
+  return (
+    <Button variant="outline" size="sm" onClick={share} className="rounded-xl h-9 gap-1.5 text-[12px]">
+      <Share2 className="w-3.5 h-3.5" /> Share
+    </Button>
   );
 }

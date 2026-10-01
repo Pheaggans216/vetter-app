@@ -10,6 +10,7 @@ import { Briefcase, CheckCircle2, MapPin, DollarSign, X, Check, FileText, Paperc
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { categoryLabel } from "@/lib/vetterCategories";
 
 const SERVICE_LABELS = {
   standard_verification: "Standard",
@@ -36,7 +37,7 @@ function JobCard({ job, onAccept, onDecline, actionPending, showActions }) {
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0 mr-3">
           <h4 className="font-heading font-semibold text-foreground text-[15px] truncate">{job.title}</h4>
-          <p className="text-muted-foreground text-[12px] mt-0.5">{CATEGORY_LABELS[job.category] || job.category}</p>
+          <p className="text-muted-foreground text-[12px] mt-0.5">{CATEGORY_LABELS[job.category] || categoryLabel(job.category)}</p>
         </div>
         <Badge variant="secondary" className="shrink-0 bg-primary/10 text-primary text-[11px]">
           {SERVICE_LABELS[job.service_type] || "Standard"}

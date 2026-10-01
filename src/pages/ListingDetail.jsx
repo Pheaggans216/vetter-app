@@ -5,9 +5,10 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, ShieldCheck, MessageCircle, AlertTriangle, CheckCircle2, Clock, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, ShieldCheck, MessageCircle, AlertTriangle, CheckCircle2, Clock, Tag, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCurrentMode } from "@/lib/roleState";
+import { categoryLabel } from "@/lib/vetterCategories";
 
 
 const CATEGORY_LABELS = {
@@ -122,7 +123,7 @@ export default function ListingDetail() {
             <span className="text-[22px] font-bold text-accent shrink-0">${listing.price?.toLocaleString()}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[12px] text-muted-foreground">{CATEGORY_LABELS[listing.category]}</span>
+            <span className="text-[12px] text-muted-foreground">{CATEGORY_LABELS[listing.category] || categoryLabel(listing.category)}</span>
             {(listing.location_city || listing.location_state) && (
               <span className="flex items-center gap-0.5 text-[12px] text-muted-foreground">
                 <MapPin className="w-3 h-3" />
@@ -186,6 +187,13 @@ export default function ListingDetail() {
           <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20">
             <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Vetting Status</p>
             <p className="text-[14px] font-heading font-bold text-foreground">{activeJob.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</p>
+            {activeJob.live_video_url && activeJob.status !== "report_ready" && activeJob.status !== "completed" && /^https:\/\//i.test(activeJob.live_video_url) && (
+              <a href={activeJob.live_video_url} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" className="mt-2 mr-2 rounded-xl text-[12px] gap-1.5">
+                  <Video className="w-3.5 h-3.5" /> Watch Inspection Live
+                </Button>
+              </a>
+            )}
             {activeJob.status === "report_ready" && (
               <Link to={`/listings/${id}/report`}>
                 <Button size="sm" className="mt-2 rounded-xl text-[12px] gap-1.5">

@@ -1,4 +1,4 @@
-import { Ban, BadgeCheck, Users, Heart } from "lucide-react";
+import { Ban, BadgeCheck, Users, Plane } from "lucide-react";
 
 const benefits = [
   {
@@ -20,9 +20,9 @@ const benefits = [
     color: "bg-accent/15 text-accent",
   },
   {
-    icon: Heart,
-    title: "Peace of mind before you pay",
-    desc: "Buy with confidence knowing an expert has your back every step of the way.",
+    icon: Plane,
+    title: "Buying from out of town?",
+    desc: "Your Vetter is your eyes on site: photos, video, a live video call and a full report before you send a dollar.",
     color: "bg-chart-3/15 text-chart-3",
   },
 ];

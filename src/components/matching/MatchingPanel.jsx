@@ -18,6 +18,18 @@ const CATEGORY_SPECIALTY_MAP = {
   furniture: ["furniture_expert"],
   tools_and_equipment: ["contractor"],
   rental_or_property_verification: ["property_verifier", "contractor"],
+  trailers_and_rvs: ["mechanic"],
+  boats_and_watercraft: ["mechanic"],
+  heavy_equipment: ["mechanic", "contractor"],
+  medical_equipment: ["electronics_technician"],
+  restaurant_equipment: ["appliance_expert"],
+  industrial_equipment: ["electronics_technician", "contractor"],
+  collectibles: ["luxury_authenticator"],
+  musical_instruments: [],
+  home_improvement: ["contractor"],
+  garden_and_outdoor: ["contractor"],
+  sporting_goods: [],
+  event_tickets: [],
   other: [],
 };
 
