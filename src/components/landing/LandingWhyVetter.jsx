@@ -21,8 +21,8 @@ const benefits = [
   },
   {
     icon: Heart,
-    title: "Peace of mind, guaranteed",
-    desc: "Buy with total confidence knowing an expert has your back every step of the way.",
+    title: "Peace of mind before you pay",
+    desc: "Buy with confidence knowing an expert has your back every step of the way.",
     color: "bg-chart-3/15 text-chart-3",
   },
 ];

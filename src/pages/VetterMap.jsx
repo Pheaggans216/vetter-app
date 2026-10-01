@@ -285,11 +285,11 @@ export default function VetterMap() {
                   zoom={mapZoom}
                   style={{ width: "100%", height: "100%" }}
                   zoomControl={false}
-                  attributionControl={false}
+                  attributionControl={true}
                 >
                   <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                    attribution="© OpenStreetMap © CARTO"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
                   <FlyTo center={mapCenter} zoom={mapZoom} />
 

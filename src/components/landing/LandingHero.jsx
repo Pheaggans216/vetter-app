@@ -83,7 +83,7 @@ export default function LandingHero() {
 
         {/* Social proof micro-copy */}
         <p className="text-[12px] text-muted-foreground mt-6">
-          ✓ Works with any marketplace &nbsp;&nbsp;✓ Vetters near you &nbsp;&nbsp;✓ Money-back guarantee
+          ✓ Works with any marketplace &nbsp;&nbsp;✓ Vetters near you &nbsp;&nbsp;✓ Cancel anytime
         </p>
       </div>
     </section>

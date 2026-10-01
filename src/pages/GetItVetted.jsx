@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -372,6 +372,23 @@ export default function GetItVetted() {
   const highValueFee = VALUE_TIERS.find(v => v.id === valueTier)?.fee || 0;
   const totalPrice = basePrice + rushFee + highValueFee;
 
+  // Restore a saved booking draft after the user signs in/up
+  useEffect(() => {
+    const DRAFT_KEY = "vetting_booking_draft";
+    const saved = sessionStorage.getItem(DRAFT_KEY);
+    if (!saved) return;
+    try {
+      const d = JSON.parse(saved);
+      if (d.form) setForm(d.form);
+      if (d.tier) setTier(d.tier);
+      if (typeof d.isRush === "boolean") setIsRush(d.isRush);
+      if (d.valueTier) setValueTier(d.valueTier);
+      if (d.listingUrl) setListingUrl(d.listingUrl);
+      if (typeof d.step === "number") setStep(d.step);
+    } catch (e) { /* ignore malformed draft */ }
+    sessionStorage.removeItem(DRAFT_KEY);
+  }, []);
+
   const handleUrlNext = () => {
     const detected = detectPlatform(listingUrl);
     update({ listing_url: listingUrl, listing_platform: detected });
@@ -396,12 +413,22 @@ export default function GetItVetted() {
   // Update value tier when price changes
   const handlePriceChange = (price) => {
     update({ listing_price: price });
-    if (price) setValueTier(getValueTierFromPrice(Number(price)));
+    if (price) {
+      const num = Number(price);
+      setValueTier(getValueTierFromPrice(num));
+      if (num < 500) setTier("basic");
+      else if (num < 5000) setTier("standard");
+      else setTier("expert");
+    }
   };
 
   const bookMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
+        sessionStorage.setItem(
+          "vetting_booking_draft",
+          JSON.stringify({ form, tier, isRush, valueTier, listingUrl, step: 2 })
+        );
         base44.auth.redirectToLogin(window.location.href);
         return;
       }
