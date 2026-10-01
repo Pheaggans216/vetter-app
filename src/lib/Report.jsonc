@@ -1,0 +1,113 @@
+{
+  "name": "Report",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string"
+    },
+    "vetter_email": {
+      "type": "string"
+    },
+    "buyer_email": {
+      "type": "string"
+    },
+    "overall_condition": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor",
+        "defective"
+      ]
+    },
+    "matches_listing": {
+      "type": "boolean"
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "negotiate",
+        "pass"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "detailed_notes": {
+      "type": "string"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "video_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "checklist_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "checked": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "issues_found": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "estimated_value": {
+      "type": "number"
+    },
+    "serial_number": {
+      "type": "string",
+      "description": "VIN, HIN, serial, IMEI or ticket ID recorded on site"
+    },
+    "stolen_check": {
+      "type": "string",
+      "enum": [
+        "not_checked",
+        "clear",
+        "flagged"
+      ],
+      "default": "not_checked"
+    },
+    "listed_price": {
+      "type": "number"
+    },
+    "inspected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inspection_lat": {
+      "type": "number"
+    },
+    "inspection_lng": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "vetter_email",
+    "overall_condition",
+    "recommendation",
+    "summary"
+  ]
+}
