@@ -171,7 +171,7 @@ export default function VetterJobReport() {
         inspection_lng: form.inspection_lng ?? undefined,
       });
 
-      await base44.entities.VetterJob.update(job.id, { status: "report_ready", report_id: report.id });
+      await base44.entities.VetterJob.update(job.id, { status: "report_ready", report_id: report.id, report_submitted_at: new Date().toISOString() });
       await base44.entities.Listing.update(job.listing_id, { vetting_status: listingStatus });
     },
     onSuccess: () => {
@@ -182,6 +182,36 @@ export default function VetterJobReport() {
     onError: () => {
       toast({ title: "Report not submitted", description: "Something went wrong. Your entries are still here. Please try again.", variant: "destructive" });
     },
+  });
+
+  const TRIP_FEE = 25;
+  const [noShowOpen, setNoShowOpen] = useState(false);
+  const [noShowReason, setNoShowReason] = useState("");
+  const noShowMutation = useMutation({
+    mutationFn: async () => {
+      const total = job.total_price || 0;
+      const tripFee = Math.min(TRIP_FEE, total);
+      await base44.entities.VetterJob.update(job.id, {
+        status: "no_show",
+        no_show_reason: noShowReason,
+        trip_fee: tripFee,
+        vetter_payout: Math.round(tripFee * 0.8 * 100) / 100,
+        platform_fee: Math.round(tripFee * 0.2 * 100) / 100,
+        refund_due: Math.max(total - tripFee, 0),
+        refund_processed: false,
+        payment_status: "partially_refunded",
+        report_submitted_at: new Date().toISOString(),
+      });
+      if (noShowReason === "item_not_there") {
+        await base44.entities.Listing.update(job.listing_id, { vetting_status: "failed_verification" });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vetter-jobs-mine"] });
+      toast({ title: "No-show recorded", description: `You'll receive the $${TRIP_FEE} trip fee (your 80% share). The buyer is refunded the rest.` });
+      navigate("/vetter/jobs");
+    },
+    onError: () => toast({ title: "Couldn't record the no-show", description: "Please try again.", variant: "destructive" }),
   });
 
   const canSubmit = form.overall_condition && form.recommendation && form.summary && form.matches_listing !== null;
@@ -365,6 +395,38 @@ export default function VetterJobReport() {
             ))}
           </div>
         </Sec>
+
+        {/* No-show */}
+        <div className="p-4 rounded-2xl border border-border/60 bg-card">
+          {!noShowOpen ? (
+            <button onClick={() => setNoShowOpen(true)} className="w-full text-left">
+              <p className="text-[13px] font-semibold text-foreground">Couldn't do the inspection?</p>
+              <p className="text-[12px] text-muted-foreground">Seller didn't show or the item wasn't there. Report it here instead of filing a report.</p>
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-[13px] font-semibold text-foreground">What happened?</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ v: "seller_no_show", l: "Seller didn't show" }, { v: "item_not_there", l: "Item wasn't there" }].map(o => (
+                  <button key={o.v} onClick={() => setNoShowReason(o.v)}
+                    className={cn("p-3 rounded-xl border-2 text-[13px] font-medium transition-all",
+                      noShowReason === o.v ? "border-primary bg-primary/5 text-primary" : "border-border/60 bg-card text-muted-foreground")}>
+                    {o.l}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                A ${TRIP_FEE} trip fee is kept for your time (you receive 80%). The buyer is refunded the rest of their payment.
+              </p>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => { setNoShowOpen(false); setNoShowReason(""); }} className="flex-1 rounded-xl">Back</Button>
+                <Button onClick={() => noShowMutation.mutate()} disabled={!noShowReason || noShowMutation.isPending} className="flex-1 rounded-xl">
+                  {noShowMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record no-show"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <Button onClick={() => submitMutation.mutate()} disabled={!canSubmit || submitMutation.isPending}
           size="lg" className="w-full rounded-xl h-12 text-[15px] font-semibold">

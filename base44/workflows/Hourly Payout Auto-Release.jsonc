@@ -1,0 +1,41 @@
+{
+  "name": "Hourly Payout Auto-Release",
+  "description": "Releases held Vetter payouts 48 hours after a report if the buyer has not confirmed or disputed.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "15 * * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "hourly_payout_auto_release",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoReleasePayouts",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

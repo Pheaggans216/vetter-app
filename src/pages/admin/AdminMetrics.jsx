@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
 import { format, subDays, parseISO, startOfDay } from "date-fns";
@@ -153,6 +153,8 @@ function InspectionInsights() {
   const grossBookings = paidJobs.reduce((s, j) => s + (j.total_price || 0), 0);
   const platformRevenue = paidJobs.reduce((s, j) => s + (j.platform_fee || 0), 0);
   const unpaidJobs = jobs.filter(j => j.status === "pending_payment").length;
+  const refundsOwed = jobs.filter(j => j.status === "no_show" && j.refund_due > 0 && !j.refund_processed);
+  const autoReleased = jobs.filter(j => j.auto_released).length;
 
   const verdicts = { buy: 0, negotiate: 0, pass: 0 };
   reports.forEach(r => { if (verdicts[r.recommendation] !== undefined) verdicts[r.recommendation]++; });
@@ -177,6 +179,8 @@ function InspectionInsights() {
     { label: "Gross bookings", value: `$${grossBookings.toLocaleString()}` },
     { label: "Vetter revenue (20%)", value: `$${platformRevenue.toLocaleString()}` },
     { label: "Started, not paid", value: unpaidJobs },
+    { label: "Refunds owed (no-shows)", value: `$${refundsOwed.reduce((s, j) => s + j.refund_due, 0).toLocaleString()}` },
+    { label: "Auto-released payouts", value: autoReleased },
     { label: "Reports filed", value: reports.length },
     { label: "Do-not-buy verdicts", value: verdicts.pass },
     { label: "Stolen-check flags", value: stolenFlags },
@@ -194,6 +198,7 @@ function InspectionInsights() {
           </div>
         ))}
       </div>
+      {refundsOwed.length > 0 && <RefundsOwed jobs={refundsOwed} />}
       <div className="bg-card rounded-2xl border border-border/60 p-5">
         <p className="font-heading font-semibold text-foreground text-[14px] mb-3">Inspections by category</p>
         {categoryRows.length === 0 ? (
@@ -218,6 +223,35 @@ function InspectionInsights() {
             </tbody>
           </table>
         )}
+      </div>
+    </div>
+  );
+}
+
+function RefundsOwed({ jobs }) {
+  const queryClient = useQueryClient();
+  const markDone = useMutation({
+    mutationFn: (id) => base44.entities.VetterJob.update(id, { refund_processed: true, payment_status: "partially_refunded" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-insights-jobs"] }),
+  });
+  return (
+    <div className="bg-card rounded-2xl border border-amber-300 p-5">
+      <p className="font-heading font-semibold text-foreground text-[14px]">Refunds to send</p>
+      <p className="text-[12px] text-muted-foreground mb-3">Send each refund in your payment dashboard (Base44 Payments / Wix), then mark it done here.</p>
+      <div className="space-y-2">
+        {jobs.map(j => (
+          <div key={j.id} className="flex items-center gap-3 text-[13px] border-t border-border/40 pt-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-foreground truncate">{j.buyer_email}</p>
+              <p className="text-[11px] text-muted-foreground">
+                {j.no_show_reason === "item_not_there" ? "Item wasn't there" : "Seller didn't show"} · paid ${j.total_price} · trip fee ${j.trip_fee}
+              </p>
+            </div>
+            <p className="font-semibold tabular-nums">${j.refund_due}</p>
+            <button onClick={() => markDone.mutate(j.id)} disabled={markDone.isPending}
+              className="text-[12px] px-3 py-1.5 rounded-lg border border-border hover:bg-muted">Mark refunded</button>
+          </div>
+        ))}
       </div>
     </div>
   );

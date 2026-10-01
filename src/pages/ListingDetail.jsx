@@ -194,6 +194,15 @@ export default function ListingDetail() {
                 </Button>
               </a>
             )}
+            {activeJob.status === "no_show" && (
+              <p className="text-[12px] text-muted-foreground mt-1.5 leading-relaxed">
+                {activeJob.no_show_reason === "item_not_there"
+                  ? "Your Vetter went to the meetup and the item wasn't there. Treat this listing as a likely scam."
+                  : "Your Vetter went to the meetup but the seller didn't show."}
+                {" "}A ${activeJob.trip_fee ?? 25} trip fee covers the Vetter's time
+                {activeJob.refund_due ? `; $${activeJob.refund_due} is being refunded to you.` : "."}
+              </p>
+            )}
             {activeJob.status === "report_ready" && (
               <Link to={`/listings/${id}/report`}>
                 <Button size="sm" className="mt-2 rounded-xl text-[12px] gap-1.5">

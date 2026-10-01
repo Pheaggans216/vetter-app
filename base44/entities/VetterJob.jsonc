@@ -69,6 +69,7 @@
         "in_progress",
         "report_ready",
         "completed",
+        "no_show",
         "disputed",
         "cancelled"
       ],
@@ -80,7 +81,8 @@
         "unpaid",
         "held",
         "released",
-        "refunded"
+        "refunded",
+        "partially_refunded"
       ],
       "default": "unpaid"
     },
@@ -134,6 +136,34 @@
     "live_video_url": {
       "type": "string",
       "description": "FaceTime/Zoom/Meet link the Vetter shares so the buyer can watch live"
+    },
+    "report_submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "auto_released": {
+      "type": "boolean",
+      "default": false,
+      "description": "Payout released automatically 48 hours after the report, with no buyer action or dispute"
+    },
+    "no_show_reason": {
+      "type": "string",
+      "enum": [
+        "seller_no_show",
+        "item_not_there"
+      ]
+    },
+    "trip_fee": {
+      "type": "number",
+      "description": "Kept from the booking when the Vetter traveled but could not inspect"
+    },
+    "refund_due": {
+      "type": "number",
+      "description": "Amount owed back to the buyer after a no-show"
+    },
+    "refund_processed": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
